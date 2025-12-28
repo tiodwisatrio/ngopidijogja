@@ -91,38 +91,51 @@ export default function CafeMap({
     const getPaymentIcon = (paymentLabel: string): string => {
       const label = paymentLabel.toLowerCase();
 
-      if (label.includes('cash') || label.includes('tunai')) {
-        return '💵';
+      if (label.includes("cash") || label.includes("tunai")) {
+        return "💵";
       }
-      if (label.includes('qris') || label.includes('qr')) {
-        return '📱';
+      if (label.includes("qris") || label.includes("qr")) {
+        return "📱";
       }
-      if (label.includes('debit') || label.includes('kredit') || label.includes('card') || label.includes('kartu')) {
-        return '💳';
+      if (
+        label.includes("debit") ||
+        label.includes("kredit") ||
+        label.includes("card") ||
+        label.includes("kartu")
+      ) {
+        return "💳";
       }
-      if (label.includes('gopay') || label.includes('ovo') || label.includes('dana') || label.includes('shopeepay')) {
-        return '📱';
+      if (
+        label.includes("gopay") ||
+        label.includes("ovo") ||
+        label.includes("dana") ||
+        label.includes("shopeepay")
+      ) {
+        return "📱";
       }
 
-      return '💰';
+      return "💰";
     };
 
     // Check if cafe is WFC-Friendly (Wi-Fi + Colokan + Toilet)
     const isWFCFriendly = (cafe: Cafe): boolean => {
       if (!cafe.facilities || cafe.facilities.length === 0) return false;
 
-      const facilityLabels = cafe.facilities.map(f =>
+      const facilityLabels = cafe.facilities.map((f) =>
         f.facility.label.toLowerCase()
       );
 
-      const hasWifi = facilityLabels.some(label =>
-        label.includes('wifi') || label.includes('wi-fi')
+      const hasWifi = facilityLabels.some(
+        (label) => label.includes("wifi") || label.includes("wi-fi")
       );
-      const hasColokan = facilityLabels.some(label =>
-        label.includes('colokan') || label.includes('charging') || label.includes('charger')
+      const hasColokan = facilityLabels.some(
+        (label) =>
+          label.includes("colokan") ||
+          label.includes("charging") ||
+          label.includes("charger")
       );
-      const hasToilet = facilityLabels.some(label =>
-        label.includes('toilet')
+      const hasToilet = facilityLabels.some((label) =>
+        label.includes("toilet")
       );
 
       return hasWifi && hasColokan && hasToilet;
@@ -180,7 +193,9 @@ export default function CafeMap({
                   ${payments
                     .map(
                       (pm) =>
-                        `<span style="background-color: #F3E5F5; color: #6A1B9A; padding: 3px 8px; border-radius: 10px; font-size: 9px; font-weight: 600;">${getPaymentIcon(pm.paymentMethod.label)} ${pm.paymentMethod.label}</span>`
+                        `<span style="background-color: #F3E5F5; color: #6A1B9A; padding: 3px 8px; border-radius: 10px; font-size: 9px; font-weight: 600;">${getPaymentIcon(
+                          pm.paymentMethod.label
+                        )} ${pm.paymentMethod.label}</span>`
                     )
                     .join("")}
                 </div>
@@ -234,10 +249,9 @@ export default function CafeMap({
         preferCanvas: true, // Use canvas rendering for better performance
       }).setView(YOGYAKARTA_CENTER, 13);
 
-      // OPTIMIZED: Force standard resolution tiles (256x256) instead of @2x (512x512)
-      // Menggunakan OpenStreetMap (free, no API key required)
+      // CartoDB Positron - Minimalist & Modern Style
       L.tileLayer(
-        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
         {
           maxZoom: 19,
           // Performance optimizations
@@ -249,7 +263,8 @@ export default function CafeMap({
           // Caching
           crossOrigin: true,
           attribution:
-            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+          subdomains: "abcd",
         }
       ).addTo(map);
 
