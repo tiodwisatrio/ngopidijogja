@@ -538,6 +538,19 @@ export default function CafeDetailSheet({
                 {cafe.openingHours &&
                   cafe.openingHours.length > 0 &&
                   (() => {
+                    // Helper function to format time from Date or string
+                    const formatTime = (time: string | Date): string => {
+                      if (typeof time === 'string') {
+                        // If string, extract HH:MM from ISO format or return as is
+                        if (time.includes('T')) {
+                          return new Date(time).toTimeString().slice(0, 5);
+                        }
+                        return time.slice(0, 5);
+                      }
+                      // If Date object, convert to HH:MM
+                      return time.toTimeString().slice(0, 5);
+                    };
+
                     // Indonesian day name mapping
                     const dayNameMap: Record<string, string> = {
                       Monday: "Senin",
@@ -568,8 +581,8 @@ export default function CafeDetailSheet({
                       if (todayHours.isOpen24Hours)
                         return { isOpen: true, text: "Buka 24 Jam" };
 
-                      const openTime = todayHours.openTime.slice(0, 5);
-                      const closeTime = todayHours.closeTime.slice(0, 5);
+                      const openTime = formatTime(todayHours.openTime);
+                      const closeTime = formatTime(todayHours.closeTime);
 
                       // Handle midnight crossing (e.g., 07:00 - 00:00 or 18:00 - 02:00)
                       let isOpen: boolean;
@@ -656,10 +669,7 @@ export default function CafeDetailSheet({
                                     ? "Tutup"
                                     : hour.isOpen24Hours
                                     ? "24 Jam"
-                                    : `${hour.openTime.slice(
-                                        0,
-                                        5
-                                      )} - ${hour.closeTime.slice(0, 5)}`}
+                                    : `${formatTime(hour.openTime)} - ${formatTime(hour.closeTime)}`}
                                 </span>
                               </div>
                             );
