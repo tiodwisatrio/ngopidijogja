@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { convertBigInt } from "@/lib/serialize";
 
 // GET opening hours by cafe ID
 export async function GET(request: NextRequest) {
@@ -17,10 +16,10 @@ export async function GET(request: NextRequest) {
     }
 
     const openingHours = await prisma.openingHour.findMany({
-      where: { cafeId: BigInt(cafeId) },
+      where: { cafeId: parseInt(cafeId) },
     });
 
-    return NextResponse.json(convertBigInt(openingHours));
+    return NextResponse.json(openingHours);
   } catch (error) {
     console.error("Error fetching opening hours:", error);
     return NextResponse.json(
@@ -50,7 +49,7 @@ export async function POST(request: NextRequest) {
 
     const openingHour = await prisma.openingHour.create({
       data: {
-        cafeId: BigInt(body.cafeId),
+        cafeId: parseInt(body.cafeId),
         dayOfWeek: body.dayOfWeek,
         openTime,
         closeTime,
@@ -60,7 +59,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(convertBigInt(openingHour), { status: 201 });
+    return NextResponse.json(openingHour), { status: 201 });
   } catch (error) {
     console.error("Error creating opening hour:", error);
     return NextResponse.json(
@@ -89,7 +88,7 @@ export async function PUT(request: NextRequest) {
     closeTime.setHours(closeHours, closeMinutes, 0, 0);
 
     const openingHour = await prisma.openingHour.update({
-      where: { id: BigInt(body.id) },
+      where: { id: parseInt(body.id) },
       data: {
         openTime,
         closeTime,
@@ -99,7 +98,7 @@ export async function PUT(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(convertBigInt(openingHour), { status: 200 });
+    return NextResponse.json(openingHour), { status: 200 });
   } catch (error) {
     console.error("Error updating opening hour:", error);
     return NextResponse.json(

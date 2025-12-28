@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { convertBigInt } from '@/lib/serialize';
 
 // GET all payment methods
 export async function GET() {
   const prisma = new PrismaClient();
   try {
     const paymentMethods = await prisma.paymentMethod.findMany();
-    return NextResponse.json(convertBigInt(paymentMethods));
+    return NextResponse.json(paymentMethods);
   } catch (error) {
     console.error('Error fetching payment methods:', error);
     return NextResponse.json(
@@ -32,7 +31,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(convertBigInt(paymentMethod), { status: 201 });
+    return NextResponse.json(paymentMethod), { status: 201 });
   } catch (error) {
     console.error('Error creating payment method:', error);
     return NextResponse.json(

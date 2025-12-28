@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
-import { convertBigInt } from '@/lib/serialize';
 
 // GET user by ID
 export async function GET(
@@ -12,7 +11,7 @@ export async function GET(
   try {
     const { id } = await params;
     const user = await prisma.user.findUnique({
-      where: { id: BigInt(id) },
+      where: { id: id },
       select: {
         id: true,
         email: true,
@@ -30,7 +29,7 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(convertBigInt(user));
+    return NextResponse.json(user);
   } catch (error) {
     console.error('Error fetching user:', error);
     return NextResponse.json(
@@ -74,7 +73,7 @@ export async function PUT(
       const existingUser = await prisma.user.findFirst({
         where: {
           email: body.email,
-          NOT: { id: BigInt(id) },
+          NOT: { id: id },
         },
       });
 
@@ -108,7 +107,7 @@ export async function PUT(
     }
 
     const user = await prisma.user.update({
-      where: { id: BigInt(id) },
+      where: { id: id },
       data: updateData,
       select: {
         id: true,
@@ -120,7 +119,7 @@ export async function PUT(
       },
     });
 
-    return NextResponse.json(convertBigInt(user));
+    return NextResponse.json(user);
   } catch (error) {
     console.error('Error updating user:', error);
     return NextResponse.json(
@@ -153,7 +152,7 @@ export async function DELETE(
     }
 
     await prisma.user.delete({
-      where: { id: BigInt(id) },
+      where: { id: id },
     });
 
     return NextResponse.json({ message: 'User deleted successfully' });

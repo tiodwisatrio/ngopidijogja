@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { convertBigInt } from '@/lib/serialize';
 
 // GET payment methods for a cafe
 export async function GET(request: NextRequest) {
@@ -17,13 +16,13 @@ export async function GET(request: NextRequest) {
     }
 
     const paymentMethods = await prisma.cafePaymentMethod.findMany({
-      where: { cafeId: BigInt(cafeId) },
+      where: { cafeId: parseInt(cafeId) },
       include: {
         paymentMethod: true,
       },
     });
 
-    return NextResponse.json(convertBigInt(paymentMethods));
+    return NextResponse.json(paymentMethods);
   } catch (error) {
     console.error('Error fetching cafe payment methods:', error);
     return NextResponse.json(
@@ -43,15 +42,15 @@ export async function POST(request: NextRequest) {
 
     const cafePaymentMethod = await prisma.cafePaymentMethod.create({
       data: {
-        cafeId: BigInt(body.cafeId),
-        paymentMethodId: BigInt(body.paymentMethodId),
+        cafeId: parseInt(body.cafeId),
+        paymentMethodId: parseInt(body.paymentMethodId),
       },
       include: {
         paymentMethod: true,
       },
     });
 
-    return NextResponse.json(convertBigInt(cafePaymentMethod), { status: 201 });
+    return NextResponse.json(cafePaymentMethod), { status: 201 });
   } catch (error) {
     console.error('Error adding payment method to cafe:', error);
     return NextResponse.json(
@@ -81,8 +80,8 @@ export async function DELETE(request: NextRequest) {
     await prisma.cafePaymentMethod.delete({
       where: {
         cafeId_paymentMethodId: {
-          cafeId: BigInt(cafeId),
-          paymentMethodId: BigInt(paymentMethodId),
+          cafeId: parseInt(cafeId),
+          paymentMethodId: parseInt(paymentMethodId),
         },
       },
     });

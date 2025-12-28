@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { convertBigInt } from "@/lib/serialize";
 
 // GET images for a cafe
 export async function GET(request: NextRequest) {
@@ -17,11 +16,11 @@ export async function GET(request: NextRequest) {
     }
 
     const images = await prisma.cafeImage.findMany({
-      where: { cafeId: BigInt(cafeId) },
+      where: { cafeId: parseInt(cafeId) },
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json(convertBigInt(images));
+    return NextResponse.json(images);
   } catch (error) {
     console.error("Error fetching cafe images:", error);
     return NextResponse.json(
@@ -41,13 +40,13 @@ export async function POST(request: NextRequest) {
 
     const image = await prisma.cafeImage.create({
       data: {
-        cafeId: BigInt(body.cafeId),
+        cafeId: parseInt(body.cafeId),
         imageUrl: body.imageUrl,
         alt: body.alt,
       },
     });
 
-    return NextResponse.json(convertBigInt(image), { status: 201 });
+    return NextResponse.json(image), { status: 201 };
   } catch (error) {
     console.error("Error creating cafe image:", error);
     return NextResponse.json(
@@ -74,7 +73,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     await prisma.cafeImage.delete({
-      where: { id: BigInt(imageId) },
+      where: { id: parseInt(imageId) },
     });
 
     return NextResponse.json({ message: "Image deleted successfully" });

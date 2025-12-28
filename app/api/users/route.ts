@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
-import { convertBigInt } from '@/lib/serialize';
 
 // GET all users
 export async function GET() {
@@ -22,7 +21,7 @@ export async function GET() {
       },
     });
 
-    return NextResponse.json(convertBigInt(users));
+    return NextResponse.json(users);
   } catch (error) {
     console.error('Error fetching users:', error);
     return NextResponse.json(
@@ -98,7 +97,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(convertBigInt(user), { status: 201 });
+    return NextResponse.json(user), { status: 201 });
   } catch (error) {
     console.error('Error creating user:', error);
     return NextResponse.json(

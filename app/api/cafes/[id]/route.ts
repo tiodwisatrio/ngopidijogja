@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { convertBigInt } from '@/lib/serialize';
 
 // GET cafe by ID
 export async function GET(
@@ -11,7 +10,7 @@ export async function GET(
   try {
     const { id } = await params;
     const cafe = await prisma.cafe.findUnique({
-      where: { id: BigInt(id) },
+      where: { id: parseInt(id) },
       include: {
         openingHours: true,
         paymentMethods: {
@@ -29,7 +28,7 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(convertBigInt(cafe));
+    return NextResponse.json(cafe);
   } catch (error) {
     console.error('Error fetching cafe:', error);
     return NextResponse.json(
@@ -52,7 +51,7 @@ export async function PUT(
     const body = await request.json();
 
     const cafe = await prisma.cafe.update({
-      where: { id: BigInt(id) },
+      where: { id: parseInt(id) },
       data: {
         name: body.name,
         address: body.address,
@@ -77,7 +76,7 @@ export async function PUT(
       },
     });
 
-    return NextResponse.json(convertBigInt(cafe));
+    return NextResponse.json(cafe);
   } catch (error) {
     console.error('Error updating cafe:', error);
     return NextResponse.json(
@@ -99,7 +98,7 @@ export async function DELETE(
     const { id } = await params;
 
     await prisma.cafe.delete({
-      where: { id: BigInt(id) },
+      where: { id: parseInt(id) },
     });
 
     return NextResponse.json({ message: 'Cafe deleted successfully' });

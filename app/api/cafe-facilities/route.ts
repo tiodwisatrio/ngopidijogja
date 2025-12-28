@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { convertBigInt } from '@/lib/serialize';
 
 // GET cafe facilities by cafeId
 export async function GET(request: NextRequest) {
@@ -17,13 +16,13 @@ export async function GET(request: NextRequest) {
     }
 
     const cafeFacilities = await prisma.cafeFacility.findMany({
-      where: { cafeId: BigInt(cafeId) },
+      where: { cafeId: parseInt(cafeId) },
       include: {
         facility: true,
       },
     });
 
-    return NextResponse.json(convertBigInt(cafeFacilities));
+    return NextResponse.json(cafeFacilities);
   } catch (error) {
     console.error('Error fetching cafe facilities:', error);
     return NextResponse.json(
@@ -51,28 +50,28 @@ export async function POST(request: NextRequest) {
 
     // Delete existing cafe facilities
     await prisma.cafeFacility.deleteMany({
-      where: { cafeId: BigInt(cafeId) },
+      where: { cafeId: parseInt(cafeId) },
     });
 
     // Insert new cafe facilities
     if (facilityIds && Array.isArray(facilityIds) && facilityIds.length > 0) {
       await prisma.cafeFacility.createMany({
         data: facilityIds.map((facilityId: string) => ({
-          cafeId: BigInt(cafeId),
-          facilityId: BigInt(facilityId),
+          cafeId: parseInt(cafeId),
+          facilityId: parseInt(facilityId),
         })),
       });
     }
 
     // Fetch and return updated facilities
     const cafeFacilities = await prisma.cafeFacility.findMany({
-      where: { cafeId: BigInt(cafeId) },
+      where: { cafeId: parseInt(cafeId) },
       include: {
         facility: true,
       },
     });
 
-    return NextResponse.json(convertBigInt(cafeFacilities));
+    return NextResponse.json(cafeFacilities);
   } catch (error) {
     console.error('Error updating cafe facilities:', error);
     return NextResponse.json(

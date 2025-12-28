@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { convertBigInt } from '@/lib/serialize';
 
 // GET single facility
 export async function GET(
@@ -11,7 +10,7 @@ export async function GET(
   try {
     const { id } = await params;
     const facility = await prisma.facility.findUnique({
-      where: { id: BigInt(id) },
+      where: { id: parseInt(id) },
       include: {
         cafes: {
           include: {
@@ -33,7 +32,7 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(convertBigInt(facility));
+    return NextResponse.json(facility);
   } catch (error) {
     console.error('Error fetching facility:', error);
     return NextResponse.json(
@@ -56,7 +55,7 @@ export async function PUT(
     const body = await request.json();
 
     const facility = await prisma.facility.update({
-      where: { id: BigInt(id) },
+      where: { id: parseInt(id) },
       data: {
         code: body.code,
         label: body.label,
@@ -64,7 +63,7 @@ export async function PUT(
       },
     });
 
-    return NextResponse.json(convertBigInt(facility));
+    return NextResponse.json(facility);
   } catch (error) {
     console.error('Error updating facility:', error);
     return NextResponse.json(
@@ -86,7 +85,7 @@ export async function DELETE(
     const { id } = await params;
 
     await prisma.facility.delete({
-      where: { id: BigInt(id) },
+      where: { id: parseInt(id) },
     });
 
     return NextResponse.json({ message: 'Facility deleted successfully' });

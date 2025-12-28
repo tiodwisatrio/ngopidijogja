@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { convertBigInt } from '@/lib/serialize';
 
 // GET all facilities
 export async function GET() {
@@ -12,7 +11,7 @@ export async function GET() {
       },
     });
 
-    return NextResponse.json(convertBigInt(facilities));
+    return NextResponse.json(facilities);
   } catch (error) {
     console.error('Error fetching facilities:', error);
     return NextResponse.json(
@@ -46,7 +45,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(convertBigInt(facility), { status: 201 });
+    return NextResponse.json(facility), { status: 201 });
   } catch (error) {
     console.error('Error creating facility:', error);
     return NextResponse.json(

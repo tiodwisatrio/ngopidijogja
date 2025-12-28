@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { convertBigInt } from '@/lib/serialize';
 
 // GET all cafes
 export async function GET() {
@@ -23,7 +22,7 @@ export async function GET() {
       },
     });
 
-    return NextResponse.json(convertBigInt(cafes));
+    return NextResponse.json(cafes);
   } catch (error) {
     console.error('Error fetching cafes:', error);
     return NextResponse.json(
@@ -72,7 +71,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(convertBigInt(cafe), { status: 201 });
+    return NextResponse.json(cafe), { status: 201 });
   } catch (error) {
     console.error('Error creating cafe:', error);
     return NextResponse.json(
