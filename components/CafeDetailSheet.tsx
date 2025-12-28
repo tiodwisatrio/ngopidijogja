@@ -328,7 +328,7 @@ export default function CafeDetailSheet({
             : "translate-y-full opacity-0 pointer-events-none md:scale-95"
         }`}
         style={{
-          maxHeight: "75vh", // FIXED: 85vh instead of 90vh untuk space swipe refresh
+          maxHeight: "80vh", // FIXED: 85vh instead of 90vh untuk space swipe refresh
           overflowY: isDragging ? "hidden" : "auto",
           zIndex: 9999,
           transform: isOpen
