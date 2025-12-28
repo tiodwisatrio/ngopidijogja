@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Cafe {
+  id                BigInt            @id @default(autoincrement())
+  slug              String            @unique
+  name              String
+  address           String            @db.Text
+  latitude          Decimal?          @db.Decimal(10, 8)
+  longitude         Decimal?          @db.Decimal(11, 8)
+  googleMapsUrl     String?           @map("google_maps_url") @db.VarChar(500)
+  instagramUrl      String?           @map("instagram_url") @db.VarChar(255)
+  parking           String?           @db.VarChar(100)
+  priceMin          Int?              @map("price_min")
+  priceMax          Int?              @map("price_max")
+  priceRange        String?           @map("price_range") @db.VarChar(10)
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
+  instagramUsername String?           @map("instagram_username") @db.VarChar(100)
+  mainImageId       BigInt?           @map("main_image_id")
+  images            CafeImage[]
+  paymentMethods    CafePaymentMethod[]
+  openingHours      OpeningHour[]
+  facilities        CafeFacility[]
+
+  @@map("cafes")
+}
+
+model CafeImage {
+  id        BigInt   @id @default(autoincrement())
+  cafeId    BigInt   @map("cafe_id")
+  imageUrl  String   @map("image_url") @db.VarChar(500)
+  alt       String?  @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("created_at")
+  cafe      Cafe     @relation(fields: [cafeId], references: [id], onDelete: Cascade)
+
+  @@index([cafeId], map: "cafe_images_cafe_id_fkey")
+  @@map("cafe_images")
+}
+
+model OpeningHour {
+  id             BigInt   @id @default(autoincrement())
+  cafeId         BigInt   @map("cafe_id")
+  dayOfWeek      String   @map("day_of_week")
+  openTime       DateTime @map("open_time") @db.Time(0)
+  closeTime      DateTime @map("close_time") @db.Time(0)
+  isClosed       Boolean  @default(false) @map("is_closed")
+  isEverydayOpen Boolean  @default(false) @map("is_everyday_open")
+  isOpen24Hours  Boolean  @default(false) @map("is_open_24_hours")
+  cafe           Cafe     @relation(fields: [cafeId], references: [id], onDelete: Cascade)
+
+  @@unique([cafeId, dayOfWeek])
+  @@map("opening_hours")
+}
+
+model PaymentMethod {
+  id    BigInt              @id @default(autoincrement())
+  code  String              @unique
+  label String
+  cafes CafePaymentMethod[]
+
+  @@map("payment_methods")
+}
+
+model CafePaymentMethod {
+  cafeId          BigInt        @map("cafe_id")
+  paymentMethodId BigInt        @map("payment_method_id")
+  cafe            Cafe          @relation(fields: [cafeId], references: [id], onDelete: Cascade)
+  paymentMethod   PaymentMethod @relation(fields: [paymentMethodId], references: [id], onDelete: Cascade)
+
+  @@id([cafeId, paymentMethodId])
+  @@index([paymentMethodId], map: "cafe_payment_methods_payment_method_id_fkey")
+  @@map("cafe_payment_methods")
+}
+
+model Facility {
+  id    BigInt         @id @default(autoincrement())
+  code  String         @unique
+  label String
+  icon  String?
+  cafes CafeFacility[]
+
+  @@map("facilities")
+}
+
+model CafeFacility {
+  cafeId     BigInt   @map("cafe_id")
+  facilityId BigInt   @map("facility_id")
+  cafe       Cafe     @relation(fields: [cafeId], references: [id], onDelete: Cascade)
+  facility   Facility @relation(fields: [facilityId], references: [id], onDelete: Cascade)
+
+  @@id([cafeId, facilityId])
+  @@index([facilityId], map: "cafe_facilities_facility_id_fkey")
+  @@map("cafe_facilities")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      String   @default("admin")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}

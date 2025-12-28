@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
 @import "tailwindcss";
 
 :root {
@@ -15,12 +16,413 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
-    --foreground: #ededed;
+    --foreground: #171616;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Popup positioning fixes */
+.leaflet-popup {
+  margin: 0 !important;
+}
+
+/* Popup animation */
+@keyframes popupFadeInScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translateY(20px);
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes popupFadeOut {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.3) translateY(20px);
+  }
+}
+
+@keyframes popupPulse {
+  0%,
+  100% {
+    box-shadow: 0 8px 24px rgba(128, 61, 59, 0.15);
+  }
+  50% {
+    box-shadow: 0 12px 32px rgba(128, 61, 59, 0.25);
+  }
+}
+
+/* Smooth shadow on popup */
+.leaflet-popup-content-wrapper {
+  border-radius: 12px !important;
+  box-shadow: 0 8px 24px rgba(128, 61, 59, 0.15) !important;
+}
+
+/* Center popup horizontally above marker */
+.cafe-popup-gmap {
+  display: flex;
+  justify-content: center;
+}
+
+.cafe-popup-gmap .leaflet-popup-content-wrapper {
+  transform-origin: center bottom !important;
+  animation: popupFadeInScale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+/* Pulse shadow animation */
+.cafe-popup-gmap.leaflet-popup-open .leaflet-popup-content-wrapper {
+  animation: popupFadeInScale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    popupPulse 3s ease-in-out infinite !important;
+  animation-delay: 0s, 0.4s !important;
+}
+
+/* Close animation */
+.cafe-popup-gmap.leaflet-popup-closing .leaflet-popup-content-wrapper {
+  animation: popupFadeOut 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+.leaflet-popup-tip {
+  box-shadow: none !important;
+  background: white !important;
+}
+
+/* Button animations in popup */
+.cafe-popup-gmap button {
+  transition: all 0.2s ease !important;
+  position: relative;
+  font-family: "Poppins", sans-serif !important;
+}
+
+.cafe-popup-gmap button:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 16px rgba(128, 61, 59, 0.2) !important;
+}
+
+.cafe-popup-gmap button:active {
+  transform: translateY(0) !important;
+  box-shadow: 0 2px 8px rgba(128, 61, 59, 0.15) !important;
+}
+
+/* Specific styles for primary button */
+.cafe-popup-gmap button:first-of-type {
+  background: linear-gradient(135deg, #803d3b 0%, #6b3230 100%) !important;
+}
+
+.cafe-popup-gmap button:first-of-type:hover {
+  background: linear-gradient(135deg, #6b3230 0%, #5a2928 100%) !important;
+}
+
+/* Specific styles for secondary button */
+.cafe-popup-gmap button:last-of-type {
+  background: linear-gradient(
+    135deg,
+    rgba(128, 61, 59, 0),
+    rgba(128, 61, 59, 0.05)
+  ) !important;
+}
+
+.cafe-popup-gmap button:last-of-type:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(128, 61, 59, 0.05),
+    rgba(128, 61, 59, 0.1)
+  ) !important;
+}
+
+/* Content stagger animation */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cafe-popup-gmap h3 {
+  animation: slideInUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both !important;
+}
+
+.cafe-popup-gmap div:nth-child(2) {
+  animation: slideInUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both !important;
+}
+
+.cafe-popup-gmap div:nth-child(3) {
+  animation: slideInUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both !important;
+}
+
+.cafe-popup-gmap div:last-child {
+  animation: slideInUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.25s both !important;
+}
+
+/* Badge hover effect */
+.cafe-popup-gmap span[style*="background-color: #C8E6C9"] {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  cursor: default;
+}
+
+.cafe-popup-gmap span[style*="background-color: #C8E6C9"]:hover {
+  transform: scale(1.05) !important;
+  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.2);
+}
+
+/* Animated placeholder cursor effect */
+input::placeholder {
+  transition: color 0.3s ease;
+}
+
+input:focus::placeholder {
+  color: transparent;
+}
+
+/* Marker Ripple Animation - OPTIMIZED */
+@keyframes markerRipple {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.cafe-marker-container {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.cafe-marker-ripple {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #ffd8d8;
+  animation: markerRipple 2s ease-out infinite;
+  will-change: transform, opacity;
+}
+
+.cafe-marker-circle {
+  position: absolute;
+  width: 35px;
+  height: 35px;
+  background-color: #ffd8d8;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(128, 61, 59, 0.2);
+  z-index: 10;
+}
+
+.cafe-marker-icon {
+  font-size: 18px;
+}
+
+/* Disable animations on low-end devices */
+@media (prefers-reduced-motion: reduce) {
+  .cafe-marker-ripple {
+    animation: none;
+  }
+}
+
+/* Hide scrollbar for horizontal scroll */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+/* SearchBar Animations */
+@keyframes dropdownSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes facilitySlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes cafeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes chipSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-enter {
+  animation: dropdownSlideIn 0.3s ease-out forwards;
+}
+
+.facility-filter-enter {
+  animation: facilitySlideIn 0.3s ease-out forwards;
+  opacity: 0;
+}
+
+.cafe-item-enter {
+  animation: cafeSlideIn 0.3s ease-out forwards;
+  opacity: 0;
+}
+
+.filter-chip-enter {
+  animation: chipSlideDown 0.3s ease-out forwards;
+  opacity: 0;
+}
+
+/* Navigation Menu Animations */
+@keyframes navMenuSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes navButtonPop {
+  from {
+    opacity: 0;
+    transform: scale(0.7) rotate(-5deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.nav-menu-container {
+  animation: navMenuSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.nav-menu-button {
+  animation: navButtonPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  opacity: 0;
+}
+
+/* Modal Animations */
+@keyframes modalBackdropFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes modalContentFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes modalBackdropFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes modalSlideDown {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+}
+
+.modal-backdrop {
+  animation: modalBackdropFadeIn 0.3s ease-out forwards;
+}
+
+.modal-backdrop-exit {
+  animation: modalBackdropFadeOut 0.3s ease-out forwards;
+}
+
+.modal-content {
+  animation: modalSlideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.modal-content-exit {
+  animation: modalSlideDown 0.3s ease-out forwards;
+}
+
+.modal-section {
+  animation: modalContentFadeIn 0.4s ease-out forwards;
+  opacity: 0;
 }

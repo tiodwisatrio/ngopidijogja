@@ -1,0 +1,90 @@
+import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
+import { convertBigInt } from "@/lib/serialize";
+
+// GET images for a cafe
+export async function GET(request: NextRequest) {
+  const prisma = new PrismaClient();
+  try {
+    const searchParams = request.nextUrl.searchParams;
+    const cafeId = searchParams.get("cafeId");
+
+    if (!cafeId) {
+      return NextResponse.json(
+        { error: "cafeId query parameter is required" },
+        { status: 400 }
+      );
+    }
+
+    const images = await prisma.cafeImage.findMany({
+      where: { cafeId: BigInt(cafeId) },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return NextResponse.json(convertBigInt(images));
+  } catch (error) {
+    console.error("Error fetching cafe images:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch cafe images" },
+      { status: 500 }
+    );
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+// POST add image to cafe
+export async function POST(request: NextRequest) {
+  const prisma = new PrismaClient();
+  try {
+    const body = await request.json();
+
+    const image = await prisma.cafeImage.create({
+      data: {
+        cafeId: BigInt(body.cafeId),
+        imageUrl: body.imageUrl,
+        alt: body.alt,
+      },
+    });
+
+    return NextResponse.json(convertBigInt(image), { status: 201 });
+  } catch (error) {
+    console.error("Error creating cafe image:", error);
+    return NextResponse.json(
+      { error: "Failed to create cafe image", details: String(error) },
+      { status: 500 }
+    );
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+// DELETE image
+export async function DELETE(request: NextRequest) {
+  const prisma = new PrismaClient();
+  try {
+    const searchParams = request.nextUrl.searchParams;
+    const imageId = searchParams.get("imageId");
+
+    if (!imageId) {
+      return NextResponse.json(
+        { error: "imageId query parameter is required" },
+        { status: 400 }
+      );
+    }
+
+    await prisma.cafeImage.delete({
+      where: { id: BigInt(imageId) },
+    });
+
+    return NextResponse.json({ message: "Image deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting cafe image:", error);
+    return NextResponse.json(
+      { error: "Failed to delete cafe image" },
+      { status: 500 }
+    );
+  } finally {
+    await prisma.$disconnect();
+  }
+}
