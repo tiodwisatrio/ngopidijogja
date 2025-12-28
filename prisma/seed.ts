@@ -42,7 +42,6 @@ async function main() {
       googleMapsUrl: "https://maps.app.goo.gl/zVxTkqYWzybtReNQ07",
       instagramUrl: "@blancoCoffeeid",
       parking: "Motor & Mobil",
-      facilities: "Wi-Fi, Toilet, Mushola",
     },
   });
 
