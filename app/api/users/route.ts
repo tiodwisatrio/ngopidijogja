@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcrypt';
 
 // GET all users
 export async function GET() {
-  const prisma = new PrismaClient();
   try {
     const users = await prisma.user.findMany({
       select: {
@@ -28,14 +27,11 @@ export async function GET() {
       { error: 'Failed to fetch users', details: String(error) },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
 // POST create new user (admin)
 export async function POST(request: NextRequest) {
-  const prisma = new PrismaClient();
   try {
     const body = await request.json();
 
@@ -104,7 +100,5 @@ export async function POST(request: NextRequest) {
       { error: 'Failed to create user', details: String(error) },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }

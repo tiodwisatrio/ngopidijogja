@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 
 // GET all cafes
 export async function GET() {
-  const prisma = new PrismaClient();
   try {
     const cafes = await prisma.cafe.findMany({
       include: {
@@ -29,14 +28,11 @@ export async function GET() {
       { error: 'Failed to fetch cafes', details: String(error) },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
 // POST create new cafe
 export async function POST(request: NextRequest) {
-  const prisma = new PrismaClient();
   try {
     const body = await request.json();
 
@@ -78,7 +74,5 @@ export async function POST(request: NextRequest) {
       { error: 'Failed to create cafe', details: String(error) },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }

@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 
 // GET all payment methods
 export async function GET() {
-  const prisma = new PrismaClient();
   try {
     const paymentMethods = await prisma.paymentMethod.findMany();
     return NextResponse.json(paymentMethods);
@@ -13,14 +12,11 @@ export async function GET() {
       { error: 'Failed to fetch payment methods', details: String(error) },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
 // POST create payment method
 export async function POST(request: NextRequest) {
-  const prisma = new PrismaClient();
   try {
     const body = await request.json();
 
@@ -38,7 +34,5 @@ export async function POST(request: NextRequest) {
       { error: 'Failed to create payment method' },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }

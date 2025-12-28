@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 
 // GET payment methods for a cafe
 export async function GET(request: NextRequest) {
-  const prisma = new PrismaClient();
   try {
     const searchParams = request.nextUrl.searchParams;
     const cafeId = searchParams.get('cafeId');
@@ -29,14 +28,11 @@ export async function GET(request: NextRequest) {
       { error: 'Failed to fetch cafe payment methods' },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
 // POST add payment method to cafe
 export async function POST(request: NextRequest) {
-  const prisma = new PrismaClient();
   try {
     const body = await request.json();
 
@@ -57,14 +53,11 @@ export async function POST(request: NextRequest) {
       { error: 'Failed to add payment method to cafe' },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
 // DELETE remove payment method from cafe
 export async function DELETE(request: NextRequest) {
-  const prisma = new PrismaClient();
   try {
     const searchParams = request.nextUrl.searchParams;
     const cafeId = searchParams.get('cafeId');
@@ -93,7 +86,5 @@ export async function DELETE(request: NextRequest) {
       { error: 'Failed to remove payment method from cafe' },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }

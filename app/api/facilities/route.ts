@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 
 // GET all facilities
 export async function GET() {
-  const prisma = new PrismaClient();
   try {
     const facilities = await prisma.facility.findMany({
       orderBy: {
@@ -18,14 +17,11 @@ export async function GET() {
       { error: 'Failed to fetch facilities', details: String(error) },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
 // POST create new facility
 export async function POST(request: NextRequest) {
-  const prisma = new PrismaClient();
   try {
     const body = await request.json();
 
@@ -52,7 +48,5 @@ export async function POST(request: NextRequest) {
       { error: 'Failed to create facility', details: String(error) },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }

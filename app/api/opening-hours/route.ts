@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from '@/lib/prisma';
 
 // GET opening hours by cafe ID
 export async function GET(request: NextRequest) {
-  const prisma = new PrismaClient();
   try {
     const searchParams = request.nextUrl.searchParams;
     const cafeId = searchParams.get("cafeId");
@@ -26,14 +25,11 @@ export async function GET(request: NextRequest) {
       { error: "Failed to fetch opening hours" },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
 // POST create opening hour
 export async function POST(request: NextRequest) {
-  const prisma = new PrismaClient();
   try {
     const body = await request.json();
 
@@ -66,14 +62,11 @@ export async function POST(request: NextRequest) {
       { error: "Failed to create opening hour", details: String(error) },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
 // PUT update opening hour
 export async function PUT(request: NextRequest) {
-  const prisma = new PrismaClient();
   try {
     const body = await request.json();
 
@@ -105,7 +98,5 @@ export async function PUT(request: NextRequest) {
       { error: "Failed to update opening hour", details: String(error) },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }

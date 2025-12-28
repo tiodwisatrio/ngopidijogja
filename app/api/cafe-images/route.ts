@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from '@/lib/prisma';
 
 // GET images for a cafe
 export async function GET(request: NextRequest) {
-  const prisma = new PrismaClient();
   try {
     const searchParams = request.nextUrl.searchParams;
     const cafeId = searchParams.get("cafeId");
@@ -27,14 +26,11 @@ export async function GET(request: NextRequest) {
       { error: "Failed to fetch cafe images" },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
 // POST add image to cafe
 export async function POST(request: NextRequest) {
-  const prisma = new PrismaClient();
   try {
     const body = await request.json();
 
@@ -53,14 +49,11 @@ export async function POST(request: NextRequest) {
       { error: "Failed to create cafe image", details: String(error) },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
 // DELETE image
 export async function DELETE(request: NextRequest) {
-  const prisma = new PrismaClient();
   try {
     const searchParams = request.nextUrl.searchParams;
     const imageId = searchParams.get("imageId");
@@ -83,7 +76,5 @@ export async function DELETE(request: NextRequest) {
       { error: "Failed to delete cafe image" },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }

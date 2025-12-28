@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 
 // GET single facility
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const prisma = new PrismaClient();
   try {
     const { id } = await params;
     const facility = await prisma.facility.findUnique({
@@ -39,8 +38,6 @@ export async function GET(
       { error: 'Failed to fetch facility', details: String(error) },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -49,7 +46,6 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const prisma = new PrismaClient();
   try {
     const { id } = await params;
     const body = await request.json();
@@ -70,8 +66,6 @@ export async function PUT(
       { error: 'Failed to update facility', details: String(error) },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -80,7 +74,6 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const prisma = new PrismaClient();
   try {
     const { id } = await params;
 
@@ -95,7 +88,5 @@ export async function DELETE(
       { error: 'Failed to delete facility', details: String(error) },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }

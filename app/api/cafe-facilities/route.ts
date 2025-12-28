@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 
 // GET cafe facilities by cafeId
 export async function GET(request: NextRequest) {
-  const prisma = new PrismaClient();
   try {
     const { searchParams } = new URL(request.url);
     const cafeId = searchParams.get('cafeId');
@@ -29,14 +28,11 @@ export async function GET(request: NextRequest) {
       { error: 'Failed to fetch cafe facilities', details: String(error) },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
 // POST bulk update cafe facilities
 export async function POST(request: NextRequest) {
-  const prisma = new PrismaClient();
   try {
     const body = await request.json();
     const { cafeId, facilityIds } = body;
@@ -78,7 +74,5 @@ export async function POST(request: NextRequest) {
       { error: 'Failed to update cafe facilities', details: String(error) },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }

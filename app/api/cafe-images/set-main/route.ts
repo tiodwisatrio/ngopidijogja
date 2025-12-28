@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 
 // PUT set main image for cafe
 export async function PUT(request: NextRequest) {
-  const prisma = new PrismaClient();
   try {
     const body = await request.json();
     const { cafeId, imageId } = body;
@@ -30,7 +29,5 @@ export async function PUT(request: NextRequest) {
       { error: 'Failed to set main image', details: String(error) },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
