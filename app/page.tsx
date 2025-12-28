@@ -167,20 +167,20 @@ export default function HomePage() {
       if (cafe) {
         console.log('Cafe found:', cafe.name);
 
-        // PREFETCH: Start fetching full cafe data immediately (before modal opens)
-        // This makes images appear instantly when modal opens
+        // Open modal IMMEDIATELY with basic data (instant feedback!)
+        setSelectedCafe(cafe);
+        setIsDetailSheetOpen(true);
+
+        // Then fetch full data in background (images will appear smoothly)
         fetch(`/api/cafes/${cafe.id}`)
           .then(res => res.json())
           .then(data => {
-            // Update selected cafe with full data (including images)
+            // Update with full data (including images)
             setSelectedCafe(data);
-            setIsDetailSheetOpen(true);
           })
           .catch(err => {
-            console.error('Prefetch failed, using basic data:', err);
-            // Fallback: open modal with basic data
-            setSelectedCafe(cafe);
-            setIsDetailSheetOpen(true);
+            console.error('Failed to fetch full cafe data:', err);
+            // Modal already open with basic data, so it's fine
           });
       } else {
         console.warn('Cafe not found with ID:', cafeId);

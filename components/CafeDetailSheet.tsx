@@ -73,7 +73,12 @@ export default function CafeDetailSheet({
 
   // State untuk selected image ID
   const [selectedImageId, setSelectedImageId] = useState<string>(
-    () => cafe?.mainImageId || cafe?.images?.[0]?.id || cafe?.mainImageId || cafe?.images?.[0]?.id || ""
+    () =>
+      cafe?.mainImageId ||
+      cafe?.images?.[0]?.id ||
+      cafe?.mainImageId ||
+      cafe?.images?.[0]?.id ||
+      ""
   );
   const [isTransitioning, setIsTransitioning] = useState(false);
 
@@ -101,9 +106,7 @@ export default function CafeDetailSheet({
     const images = cafe?.images || [];
     if (images.length <= 1) return;
 
-    const currentIndex = images.findIndex(
-      (img) => img.id === selectedImageId
-    );
+    const currentIndex = images.findIndex((img) => img.id === selectedImageId);
     const nextIndex = (currentIndex + 1) % images.length;
     setSelectedImageId(images[nextIndex].id);
   };
@@ -112,9 +115,7 @@ export default function CafeDetailSheet({
     const images = cafe?.images || [];
     if (images.length <= 1) return;
 
-    const currentIndex = images.findIndex(
-      (img) => img.id === selectedImageId
-    );
+    const currentIndex = images.findIndex((img) => img.id === selectedImageId);
     const previousIndex =
       currentIndex === 0 ? images.length - 1 : currentIndex - 1;
     setSelectedImageId(images[previousIndex].id);
@@ -272,20 +273,30 @@ export default function CafeDetailSheet({
   const getPaymentIcon = (paymentLabel: string): string => {
     const label = paymentLabel.toLowerCase();
 
-    if (label.includes('cash') || label.includes('tunai')) {
-      return '💵'; // Cash icon
+    if (label.includes("cash") || label.includes("tunai")) {
+      return "💵"; // Cash icon
     }
-    if (label.includes('qris') || label.includes('qr')) {
-      return '📱'; // QR code / mobile payment icon
+    if (label.includes("qris") || label.includes("qr")) {
+      return "📱"; // QR code / mobile payment icon
     }
-    if (label.includes('debit') || label.includes('kredit') || label.includes('card') || label.includes('kartu')) {
-      return '💳'; // Card icon
+    if (
+      label.includes("debit") ||
+      label.includes("kredit") ||
+      label.includes("card") ||
+      label.includes("kartu")
+    ) {
+      return "💳"; // Card icon
     }
-    if (label.includes('gopay') || label.includes('ovo') || label.includes('dana') || label.includes('shopeepay')) {
-      return '📱'; // E-wallet icon
+    if (
+      label.includes("gopay") ||
+      label.includes("ovo") ||
+      label.includes("dana") ||
+      label.includes("shopeepay")
+    ) {
+      return "📱"; // E-wallet icon
     }
 
-    return '💰'; // Default money icon
+    return "💰"; // Default money icon
   };
 
   return (
@@ -317,7 +328,7 @@ export default function CafeDetailSheet({
             : "translate-y-full opacity-0 pointer-events-none md:scale-95"
         }`}
         style={{
-          maxHeight: "85vh", // FIXED: 85vh instead of 90vh untuk space swipe refresh
+          maxHeight: "75vh", // FIXED: 85vh instead of 90vh untuk space swipe refresh
           overflowY: isDragging ? "hidden" : "auto",
           zIndex: 9999,
           transform: isOpen
@@ -375,6 +386,30 @@ export default function CafeDetailSheet({
             <div className="md:grid md:grid-cols-2 md:gap-6 md:p-6 md:pt-12">
               {/* Left Column: Images */}
               <div className="md:col-span-1">
+                {/* Loading Skeleton - show when no images yet */}
+                {(!cafe?.images || cafe.images.length === 0) && (
+                  <div className="w-full px-6 md:px-0 mb-6 md:mb-0">
+                    <div className="space-y-2">
+                      {/* Main image skeleton */}
+                      <div className="relative w-full h-64 md:h-96 bg-gray-200 rounded-2xl overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-pulse"></div>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="text-gray-400 text-sm font-medium">Loading images...</div>
+                        </div>
+                      </div>
+                      {/* Thumbnail skeletons */}
+                      <div className="grid grid-cols-3 gap-2">
+                        {[1, 2, 3].map((i) => (
+                          <div key={i} className="relative w-full h-24 bg-gray-200 rounded-xl overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-pulse"></div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Actual Images - show when loaded */}
                 {cafe?.images && cafe.images.length > 0 && (
                   <div className="w-full px-6 md:px-0 mb-6 md:mb-0">
                     {(() => {
@@ -542,15 +577,35 @@ export default function CafeDetailSheet({
                   </div>
                 )}
 
-                {/* Opening Hours */}
+                {/* Opening Hours Skeleton - show when loading */}
+                {(!cafe?.openingHours || cafe.openingHours.length === 0) && (
+                  <div className="px-6 md:px-0 mb-6">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-lg font-semibold text-[#333]">
+                        Jam Operasional
+                      </h3>
+                      <div className="h-6 w-24 bg-gray-200 rounded-full animate-pulse"></div>
+                    </div>
+                    <div className="bg-gray-50 border border-gray-200 rounded-xl overflow-hidden">
+                      {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+                        <div key={i} className="flex justify-between items-center px-4 py-3 border-b border-gray-200 last:border-b-0">
+                          <div className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
+                          <div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Opening Hours - show when loaded */}
                 {cafe?.openingHours &&
                   cafe.openingHours.length > 0 &&
                   (() => {
                     // Helper function to format time from Date or string
                     const formatTime = (time: string | Date): string => {
-                      if (typeof time === 'string') {
+                      if (typeof time === "string") {
                         // If string, extract HH:MM from ISO format or return as is
-                        if (time.includes('T')) {
+                        if (time.includes("T")) {
                           return new Date(time).toTimeString().slice(0, 5);
                         }
                         return time.slice(0, 5);
@@ -640,7 +695,8 @@ export default function CafeDetailSheet({
 
                             // Determine if today is open or closed (based on real-time status)
                             const isTodayOpen = isToday && currentStatus.isOpen;
-                            const isTodayClosed = isToday && !currentStatus.isOpen;
+                            const isTodayClosed =
+                              isToday && !currentStatus.isOpen;
 
                             return (
                               <div
@@ -677,7 +733,9 @@ export default function CafeDetailSheet({
                                     ? "Tutup"
                                     : hour.isOpen24Hours
                                     ? "24 Jam"
-                                    : `${formatTime(hour.openTime)} - ${formatTime(hour.closeTime)}`}
+                                    : `${formatTime(
+                                        hour.openTime
+                                      )} - ${formatTime(hour.closeTime)}`}
                                 </span>
                               </div>
                             );
@@ -694,7 +752,7 @@ export default function CafeDetailSheet({
                       Harga Menu
                     </h3>
                     <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
-                      {(cafe?.priceMin && cafe?.priceMax) && (
+                      {cafe?.priceMin && cafe?.priceMax && (
                         <div className="text-gray-900 font-bold text-lg">
                           Rp {(cafe.priceMin || 0).toLocaleString("id-ID")} -{" "}
                           {(cafe.priceMax || 0).toLocaleString("id-ID")}
