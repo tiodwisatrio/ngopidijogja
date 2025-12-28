@@ -166,8 +166,22 @@ export default function HomePage() {
 
       if (cafe) {
         console.log('Cafe found:', cafe.name);
-        setSelectedCafe(cafe);
-        setIsDetailSheetOpen(true);
+
+        // PREFETCH: Start fetching full cafe data immediately (before modal opens)
+        // This makes images appear instantly when modal opens
+        fetch(`/api/cafes/${cafe.id}`)
+          .then(res => res.json())
+          .then(data => {
+            // Update selected cafe with full data (including images)
+            setSelectedCafe(data);
+            setIsDetailSheetOpen(true);
+          })
+          .catch(err => {
+            console.error('Prefetch failed, using basic data:', err);
+            // Fallback: open modal with basic data
+            setSelectedCafe(cafe);
+            setIsDetailSheetOpen(true);
+          });
       } else {
         console.warn('Cafe not found with ID:', cafeId);
       }
