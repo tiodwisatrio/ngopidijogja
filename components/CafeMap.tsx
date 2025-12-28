@@ -235,11 +235,11 @@ export default function CafeMap({
       }).setView(YOGYAKARTA_CENTER, 13);
 
       // OPTIMIZED: Force standard resolution tiles (256x256) instead of @2x (512x512)
-      // Menggunakan Stadia Maps (lighter tiles dengan compression lebih baik)
+      // Menggunakan OpenStreetMap (free, no API key required)
       L.tileLayer(
-        "https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png",
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
         {
-          maxZoom: 20,
+          maxZoom: 19,
           // Performance optimizations
           keepBuffer: 2, // Keep 2 screens of tiles in memory
           updateWhenIdle: false, // Update while panning (smoother UX)
@@ -249,7 +249,7 @@ export default function CafeMap({
           // Caching
           crossOrigin: true,
           attribution:
-            '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>',
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         }
       ).addTo(map);
 
