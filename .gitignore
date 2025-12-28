@@ -47,3 +47,11 @@ next-env.d.ts
 # Uploads
 public/uploads/*
 !public/uploads/.gitkeep
+
+# Database exports (contains sensitive data)
+exports/
+*.json.backup
+.env.backup
+
+.vercel
+.env*.local

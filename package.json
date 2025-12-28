@@ -7,7 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "seed": "node --loader ts-node/esm prisma/seed.ts"
+    "seed": "node --loader ts-node/esm prisma/seed.ts",
+    "switch:dev": "node scripts/switch-to-dev.js",
+    "switch:prod": "node scripts/switch-to-prod.js",
+    "export:data": "npx tsx scripts/export-data.ts",
+    "import:data": "npx tsx scripts/import-data.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.1",
