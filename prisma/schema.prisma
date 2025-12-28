@@ -3,27 +3,27 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model Cafe {
-  id                BigInt            @id @default(autoincrement())
+  id                Int               @id @default(autoincrement())
   slug              String            @unique
   name              String
-  address           String            @db.Text
+  address           String
   latitude          Decimal?          @db.Decimal(10, 8)
   longitude         Decimal?          @db.Decimal(11, 8)
-  googleMapsUrl     String?           @map("google_maps_url") @db.VarChar(500)
-  instagramUrl      String?           @map("instagram_url") @db.VarChar(255)
-  parking           String?           @db.VarChar(100)
+  googleMapsUrl     String?           @map("google_maps_url")
+  instagramUrl      String?           @map("instagram_url")
+  parking           String?
   priceMin          Int?              @map("price_min")
   priceMax          Int?              @map("price_max")
-  priceRange        String?           @map("price_range") @db.VarChar(10)
+  priceRange        String?           @map("price_range")
   createdAt         DateTime          @default(now()) @map("created_at")
   updatedAt         DateTime          @updatedAt @map("updated_at")
-  instagramUsername String?           @map("instagram_username") @db.VarChar(100)
-  mainImageId       BigInt?           @map("main_image_id")
+  instagramUsername String?           @map("instagram_username")
+  mainImageId       Int?              @map("main_image_id")
   images            CafeImage[]
   paymentMethods    CafePaymentMethod[]
   openingHours      OpeningHour[]
@@ -33,20 +33,20 @@ model Cafe {
 }
 
 model CafeImage {
-  id        BigInt   @id @default(autoincrement())
-  cafeId    BigInt   @map("cafe_id")
-  imageUrl  String   @map("image_url") @db.VarChar(500)
-  alt       String?  @db.VarChar(255)
+  id        Int      @id @default(autoincrement())
+  cafeId    Int      @map("cafe_id")
+  imageUrl  String   @map("image_url")
+  alt       String?
   createdAt DateTime @default(now()) @map("created_at")
   cafe      Cafe     @relation(fields: [cafeId], references: [id], onDelete: Cascade)
 
-  @@index([cafeId], map: "cafe_images_cafe_id_fkey")
+  @@index([cafeId])
   @@map("cafe_images")
 }
 
 model OpeningHour {
-  id             BigInt   @id @default(autoincrement())
-  cafeId         BigInt   @map("cafe_id")
+  id             Int      @id @default(autoincrement())
+  cafeId         Int      @map("cafe_id")
   dayOfWeek      String   @map("day_of_week")
   openTime       DateTime @map("open_time") @db.Time(0)
   closeTime      DateTime @map("close_time") @db.Time(0)
@@ -60,7 +60,7 @@ model OpeningHour {
 }
 
 model PaymentMethod {
-  id    BigInt              @id @default(autoincrement())
+  id    Int                 @id @default(autoincrement())
   code  String              @unique
   label String
   cafes CafePaymentMethod[]
@@ -69,18 +69,18 @@ model PaymentMethod {
 }
 
 model CafePaymentMethod {
-  cafeId          BigInt        @map("cafe_id")
-  paymentMethodId BigInt        @map("payment_method_id")
+  cafeId          Int           @map("cafe_id")
+  paymentMethodId Int           @map("payment_method_id")
   cafe            Cafe          @relation(fields: [cafeId], references: [id], onDelete: Cascade)
   paymentMethod   PaymentMethod @relation(fields: [paymentMethodId], references: [id], onDelete: Cascade)
 
   @@id([cafeId, paymentMethodId])
-  @@index([paymentMethodId], map: "cafe_payment_methods_payment_method_id_fkey")
+  @@index([paymentMethodId])
   @@map("cafe_payment_methods")
 }
 
 model Facility {
-  id    BigInt         @id @default(autoincrement())
+  id    Int            @id @default(autoincrement())
   code  String         @unique
   label String
   icon  String?
@@ -90,13 +90,13 @@ model Facility {
 }
 
 model CafeFacility {
-  cafeId     BigInt   @map("cafe_id")
-  facilityId BigInt   @map("facility_id")
+  cafeId     Int      @map("cafe_id")
+  facilityId Int      @map("facility_id")
   cafe       Cafe     @relation(fields: [cafeId], references: [id], onDelete: Cascade)
   facility   Facility @relation(fields: [facilityId], references: [id], onDelete: Cascade)
 
   @@id([cafeId, facilityId])
-  @@index([facilityId], map: "cafe_facilities_facility_id_fkey")
+  @@index([facilityId])
   @@map("cafe_facilities")
 }
 

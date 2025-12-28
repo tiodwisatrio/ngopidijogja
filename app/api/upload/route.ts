@@ -1,17 +1,6 @@
+import { put } from '@vercel/blob';
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
-import { existsSync } from 'fs';
 import sharp from 'sharp';
-
-// Configure route to accept larger file uploads
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '10mb',
-    },
-  },
-};
 
 export async function POST(request: NextRequest) {
   try {
@@ -44,44 +33,35 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Create uploads directory if it doesn't exist
-    const uploadsDir = join(process.cwd(), 'public', 'uploads');
-    if (!existsSync(uploadsDir)) {
-      await mkdir(uploadsDir, { recursive: true });
-    }
-
-    // Generate unique filename
-    const timestamp = Date.now();
-    const filename = `${timestamp}-${file.name}`;
-    const filepath = join(uploadsDir, filename);
-
     // Auto-resize and optimize large images
     // Max width: 2560px (2K resolution), quality: 95%
-    // This prevents huge images (6000x4000) from causing quality degradation
     let sharpInstance = sharp(buffer)
       .resize(2560, 2560, {
-        fit: 'inside', // Maintain aspect ratio
-        withoutEnlargement: true, // Don't upscale small images
+        fit: 'inside',
+        withoutEnlargement: true,
       });
 
     // Output based on original file type
     if (file.type === 'image/png') {
       sharpInstance = sharpInstance.png({ quality: 95, compressionLevel: 6 });
     } else {
-      // Default to JPEG for all other images (jpg, webp, etc)
       sharpInstance = sharpInstance.jpeg({ quality: 95, progressive: true });
     }
 
     const optimizedBuffer = await sharpInstance.toBuffer();
 
-    // Write optimized file to disk
-    await writeFile(filepath, optimizedBuffer);
+    // Generate unique filename
+    const timestamp = Date.now();
+    const filename = `${timestamp}-${file.name}`;
 
-    // Return the URL path
-    const imageUrl = `/uploads/${filename}`;
+    // Upload to Vercel Blob
+    const blob = await put(filename, optimizedBuffer, {
+      access: 'public',
+      contentType: file.type === 'image/png' ? 'image/png' : 'image/jpeg',
+    });
 
     return NextResponse.json(
-      { imageUrl, filename },
+      { imageUrl: blob.url, filename },
       { status: 201 }
     );
   } catch (error) {
