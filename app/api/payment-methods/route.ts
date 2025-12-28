@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(paymentMethod), { status: 201 });
+    return NextResponse.json(paymentMethod, { status: 201 });
   } catch (error) {
     console.error('Error creating payment method:', error);
     return NextResponse.json(

@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(openingHour), { status: 201 });
+    return NextResponse.json(openingHour, { status: 201 });
   } catch (error) {
     console.error("Error creating opening hour:", error);
     return NextResponse.json(
@@ -98,7 +98,7 @@ export async function PUT(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(openingHour), { status: 200 });
+    return NextResponse.json(openingHour, { status: 200 });
   } catch (error) {
     console.error("Error updating opening hour:", error);
     return NextResponse.json(

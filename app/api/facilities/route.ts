@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(facility), { status: 201 });
+    return NextResponse.json(facility, { status: 201 });
   } catch (error) {
     console.error('Error creating facility:', error);
     return NextResponse.json(

@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(cafe), { status: 201 });
+    return NextResponse.json(cafe, { status: 201 });
   } catch (error) {
     console.error('Error creating cafe:', error);
     return NextResponse.json(

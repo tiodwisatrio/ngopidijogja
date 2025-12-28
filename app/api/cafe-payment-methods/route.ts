@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(cafePaymentMethod), { status: 201 });
+    return NextResponse.json(cafePaymentMethod, { status: 201 });
   } catch (error) {
     console.error('Error adding payment method to cafe:', error);
     return NextResponse.json(
