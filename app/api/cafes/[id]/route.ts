@@ -17,6 +17,12 @@ export async function GET(
             paymentMethod: true,
           },
         },
+        images: true,
+        facilities: {
+          include: {
+            facility: true,
+          },
+        },
       },
     });
 
@@ -27,7 +33,12 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(cafe);
+    // Cache individual cafe details for 5 minutes
+    return NextResponse.json(cafe, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+      },
+    });
   } catch (error) {
     console.error('Error fetching cafe:', error);
     return NextResponse.json(

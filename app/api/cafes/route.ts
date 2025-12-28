@@ -1,27 +1,55 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-// GET all cafes
+// GET all cafes (optimized for map view - excludes heavy data)
 export async function GET() {
   try {
     const cafes = await prisma.cafe.findMany({
-      include: {
-        openingHours: true,
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        address: true,
+        latitude: true,
+        longitude: true,
+        parking: true,
+        googleMapsUrl: true,
+        instagramUrl: true,
+        instagramUsername: true,
+        // Only include essential relations for map markers
         paymentMethods: {
-          include: {
-            paymentMethod: true,
+          select: {
+            paymentMethod: {
+              select: {
+                code: true,
+                label: true,
+              },
+            },
           },
         },
-        images: true,
         facilities: {
-          include: {
-            facility: true,
+          select: {
+            facility: {
+              select: {
+                id: true,
+                code: true,
+                label: true,
+                icon: true,
+              },
+            },
           },
         },
+        // Exclude images and openingHours - too heavy for initial load
+        // These will be fetched separately when detail sheet is opened
       },
     });
 
-    return NextResponse.json(cafes);
+    // Cache response for 60 seconds with stale-while-revalidate
+    return NextResponse.json(cafes, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
+      },
+    });
   } catch (error) {
     console.error('Error fetching cafes:', error);
     return NextResponse.json(
