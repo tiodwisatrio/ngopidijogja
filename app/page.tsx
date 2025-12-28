@@ -158,10 +158,18 @@ export default function HomePage() {
   // Expose function to window for popup button clicks
   useEffect(() => {
     const showDetail = (cafeId: string) => {
-      const cafe = filteredCafes.find((c) => c.id === cafeId);
+      console.log('showDetail called with ID:', cafeId, 'type:', typeof cafeId);
+      console.log('Available cafe IDs:', filteredCafes.map(c => `${c.id} (${typeof c.id})`));
+
+      // Try both string and number comparison
+      const cafe = filteredCafes.find((c) => String(c.id) === String(cafeId));
+
       if (cafe) {
+        console.log('Cafe found:', cafe.name);
         setSelectedCafe(cafe);
         setIsDetailSheetOpen(true);
+      } else {
+        console.warn('Cafe not found with ID:', cafeId);
       }
     };
 
