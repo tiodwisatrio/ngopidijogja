@@ -66,14 +66,37 @@ export default function CafeDetailSheet({
   isOpen,
   onClose,
 }: CafeDetailSheetProps) {
-  const facilities = cafe?.facilities || [];
-  const parking = cafe?.parking ? cafe.parking.split(", ") : [];
-  const payments = cafe?.paymentMethods || [];
+  // State for full cafe details (with images & openingHours)
+  const [fullCafe, setFullCafe] = useState<Cafe | null>(null);
 
-  // State untuk selected image ID - gunakan key dari cafe ID untuk auto-reset
-  const resetKey = cafe?.id || "default";
+  const facilities = fullCafe?.facilities || cafe?.facilities || [];
+  const parking = fullCafe?.parking || cafe?.parking ? (fullCafe?.parking || cafe?.parking || "").split(", ") : [];
+  const payments = fullCafe?.paymentMethods || cafe?.paymentMethods || [];
+
+  // Fetch full cafe details when sheet opens
+  useEffect(() => {
+    if (isOpen && cafe?.id && !fullCafe) {
+      fetch(`/api/cafes/${cafe.id}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setFullCafe(data);
+        })
+        .catch((err) => {
+          console.error("Failed to fetch cafe details:", err);
+          // Fallback to basic cafe data
+          setFullCafe(cafe);
+        });
+    }
+
+    // Reset when sheet closes
+    if (!isOpen) {
+      setFullCafe(null);
+    }
+  }, [isOpen, cafe]);
+
+  // State untuk selected image ID
   const [selectedImageId, setSelectedImageId] = useState<string>(
-    () => cafe?.mainImageId || cafe?.images?.[0]?.id || ""
+    () => fullCafe?.mainImageId || fullCafe?.images?.[0]?.id || cafe?.mainImageId || cafe?.images?.[0]?.id || ""
   );
   const [isTransitioning, setIsTransitioning] = useState(false);
 
@@ -98,24 +121,26 @@ export default function CafeDetailSheet({
 
   // Navigate to next/previous image in lightbox
   const goToNextImage = () => {
-    if (!cafe?.images || cafe.images.length <= 1) return;
+    const images = fullCafe?.images || cafe?.images || [];
+    if (images.length <= 1) return;
 
-    const currentIndex = cafe.images.findIndex(
+    const currentIndex = images.findIndex(
       (img) => img.id === selectedImageId
     );
-    const nextIndex = (currentIndex + 1) % cafe.images.length;
-    setSelectedImageId(cafe.images[nextIndex].id);
+    const nextIndex = (currentIndex + 1) % images.length;
+    setSelectedImageId(images[nextIndex].id);
   };
 
   const goToPreviousImage = () => {
-    if (!cafe?.images || cafe.images.length <= 1) return;
+    const images = fullCafe?.images || cafe?.images || [];
+    if (images.length <= 1) return;
 
-    const currentIndex = cafe.images.findIndex(
+    const currentIndex = images.findIndex(
       (img) => img.id === selectedImageId
     );
     const previousIndex =
-      currentIndex === 0 ? cafe.images.length - 1 : currentIndex - 1;
-    setSelectedImageId(cafe.images[previousIndex].id);
+      currentIndex === 0 ? images.length - 1 : currentIndex - 1;
+    setSelectedImageId(images[previousIndex].id);
   };
 
   // Touch handlers for swipe
@@ -172,13 +197,14 @@ export default function CafeDetailSheet({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLightboxOpen, selectedImageId]);
 
-  // Update selectedImageId hanya saat cafe berubah
+  // Update selectedImageId when fullCafe data is loaded
   useEffect(() => {
-    if (cafe?.mainImageId) {
-      setSelectedImageId(cafe.mainImageId);
+    if (fullCafe?.mainImageId) {
+      setSelectedImageId(fullCafe.mainImageId);
+    } else if (fullCafe?.images?.[0]?.id) {
+      setSelectedImageId(fullCafe.images[0].id);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resetKey]);
+  }, [fullCafe]);
 
   // Reset drag state saat sheet ditutup
   useEffect(() => {
@@ -367,14 +393,14 @@ export default function CafeDetailSheet({
             <div className="md:grid md:grid-cols-2 md:gap-6 md:p-6 md:pt-12">
               {/* Left Column: Images */}
               <div className="md:col-span-1">
-                {cafe.images && cafe.images.length > 0 && (
+                {fullCafe?.images && fullCafe.images.length > 0 && (
                   <div className="w-full px-6 md:px-0 mb-6 md:mb-0">
                     {(() => {
                       const displayedMainImage =
-                        cafe.images.find((img) => img.id === selectedImageId) ||
-                        cafe.images[0];
+                        fullCafe.images.find((img) => img.id === selectedImageId) ||
+                        fullCafe.images[0];
 
-                      const otherImages = cafe.images.filter(
+                      const otherImages = fullCafe.images.filter(
                         (img) => img.id !== selectedImageId
                       );
 
@@ -535,8 +561,8 @@ export default function CafeDetailSheet({
                 )}
 
                 {/* Opening Hours */}
-                {cafe.openingHours &&
-                  cafe.openingHours.length > 0 &&
+                {fullCafe?.openingHours &&
+                  fullCafe.openingHours.length > 0 &&
                   (() => {
                     // Helper function to format time from Date or string
                     const formatTime = (time: string | Date): string => {
@@ -572,7 +598,7 @@ export default function CafeDetailSheet({
                     const getCurrentStatus = () => {
                       const now = new Date();
                       const currentTime = now.toTimeString().slice(0, 5); // "HH:MM"
-                      const todayHours = cafe.openingHours?.find(
+                      const todayHours = fullCafe.openingHours?.find(
                         (h) => h.dayOfWeek === currentDayEnglish
                       );
 
@@ -624,7 +650,7 @@ export default function CafeDetailSheet({
                           </span>
                         </div>
                         <div className="bg-gray-50 border border-gray-200 rounded-xl overflow-hidden">
-                          {cafe.openingHours.map((hour) => {
+                          {fullCafe.openingHours.map((hour) => {
                             const isToday =
                               hour.dayOfWeek === currentDayEnglish;
                             const dayIndonesian =
@@ -680,16 +706,16 @@ export default function CafeDetailSheet({
                   })()}
 
                 {/* Price Range Section */}
-                {(cafe.priceMin || cafe.priceMax) && (
+                {((fullCafe?.priceMin || cafe?.priceMin) || (fullCafe?.priceMax || cafe?.priceMax)) && (
                   <div className="px-6 md:px-0 mb-6">
                     <h3 className="text-lg font-semibold text-[#333] mb-3">
                       Harga Menu
                     </h3>
                     <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
-                      {cafe.priceMin && cafe.priceMax && (
+                      {((fullCafe?.priceMin || cafe?.priceMin) && (fullCafe?.priceMax || cafe?.priceMax)) && (
                         <div className="text-gray-900 font-bold text-lg">
-                          Rp {cafe.priceMin.toLocaleString("id-ID")} -{" "}
-                          {cafe.priceMax.toLocaleString("id-ID")}
+                          Rp {(fullCafe?.priceMin || cafe?.priceMin || 0).toLocaleString("id-ID")} -{" "}
+                          {(fullCafe?.priceMax || cafe?.priceMax || 0).toLocaleString("id-ID")}
                         </div>
                       )}
                     </div>
@@ -776,7 +802,7 @@ export default function CafeDetailSheet({
       </div>
 
       {/* Image Lightbox */}
-      {isLightboxOpen && cafe && (
+      {isLightboxOpen && (cafe || fullCafe) && (
         <div
           className="fixed inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-300 animate-in fade-in"
           style={{ zIndex: 10000 }}
@@ -819,15 +845,15 @@ export default function CafeDetailSheet({
           </div>
 
           {/* Image counter */}
-          {cafe.images && cafe.images.length > 1 && (
+          {fullCafe?.images && fullCafe.images.length > 1 && (
             <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-md text-white px-4 py-2 rounded-full text-sm font-medium">
-              {cafe.images.findIndex((img) => img.id === selectedImageId) + 1} /{" "}
-              {cafe.images.length}
+              {fullCafe.images.findIndex((img) => img.id === selectedImageId) + 1} /{" "}
+              {fullCafe.images.length}
             </div>
           )}
 
           {/* Previous button */}
-          {cafe.images && cafe.images.length > 1 && (
+          {fullCafe?.images && fullCafe.images.length > 1 && (
             <button
               type="button"
               onClick={(e) => {
@@ -855,7 +881,7 @@ export default function CafeDetailSheet({
           )}
 
           {/* Next button */}
-          {cafe.images && cafe.images.length > 1 && (
+          {fullCafe?.images && fullCafe.images.length > 1 && (
             <button
               type="button"
               onClick={(e) => {
@@ -892,8 +918,8 @@ export default function CafeDetailSheet({
           >
             {(() => {
               const displayedImage =
-                cafe.images?.find((img) => img.id === selectedImageId) ||
-                cafe.images?.[0];
+                fullCafe?.images?.find((img) => img.id === selectedImageId) ||
+                fullCafe?.images?.[0];
 
               if (!displayedImage) return null;
 
@@ -901,7 +927,7 @@ export default function CafeDetailSheet({
                 <div className="relative w-full h-full">
                   <Image
                     src={displayedImage.imageUrl}
-                    alt={displayedImage.alt || cafe.name}
+                    alt={displayedImage.alt || (fullCafe?.name || cafe?.name || "Cafe")}
                     fill
                     className="object-contain"
                     sizes="100vw"
@@ -914,9 +940,9 @@ export default function CafeDetailSheet({
           </div>
 
           {/* Cafe name caption */}
-          {cafe.name && (
+          {(fullCafe?.name || cafe?.name) && (
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-md text-white px-6 py-3 rounded-full text-sm md:text-base font-medium max-w-md text-center">
-              {cafe.name}
+              {fullCafe?.name || cafe?.name}
             </div>
           )}
         </div>
