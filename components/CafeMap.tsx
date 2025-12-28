@@ -205,9 +205,9 @@ export default function CafeMap({
               : ""
           }
           <div style="display: flex; gap: 6px; margin-top: 6px; width: 100%;">
-            <button style="flex: 1; background: #803D3B !important; color: white !important; border: none !important; padding: 8px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; box-sizing: border-box; text-decoration: none; display: flex; align-items: center; justify-content: center; font-family: 'Poppins', sans-serif;" onmouseover="this.style.setProperty('background', '#6B3230', 'important')" onmouseout="this.style.setProperty('background', '#803D3B', 'important')" onclick="window.__showCafeDetail('${
+            <button style="flex: 1; background: #803D3B !important; color: white !important; border: none !important; padding: 8px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; box-sizing: border-box; text-decoration: none; display: flex; align-items: center; justify-content: center; font-family: 'Poppins', sans-serif;" onmouseover="this.style.setProperty('background', '#6B3230', 'important')" onmouseout="this.style.setProperty('background', '#803D3B', 'important')" onclick="window.__showCafeDetail && window.__showCafeDetail('${String(
               cafe.id
-            }'); event.stopPropagation();">
+            )}'); event.stopPropagation();">
               Lihat Detail
             </button>
             ${
