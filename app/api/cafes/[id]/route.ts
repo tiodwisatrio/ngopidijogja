@@ -72,7 +72,7 @@ export async function PUT(
         priceMin: body.priceMin ? parseInt(body.priceMin) : null,
         priceMax: body.priceMax ? parseInt(body.priceMax) : null,
         priceRange: body.priceRange || null,
-        facilities: body.facilities,
+        mainImageId: body.mainImageId ? parseInt(body.mainImageId) : null,
       },
       include: {
         openingHours: true,
