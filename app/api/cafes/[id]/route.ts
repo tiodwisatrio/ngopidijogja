@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 
@@ -84,6 +85,12 @@ export async function PUT(
       },
     });
 
+    // Revalidate cache after update
+    revalidatePath('/');
+    revalidatePath('/admin/cafes');
+    revalidatePath(`/admin/cafes/${id}`);
+    revalidatePath(`/api/cafes/${id}`);
+
     return NextResponse.json(cafe);
   } catch (error) {
     console.error('Error updating cafe:', error);
@@ -105,6 +112,10 @@ export async function DELETE(
     await prisma.cafe.delete({
       where: { id: parseInt(id) },
     });
+
+    // Revalidate cache after delete
+    revalidatePath('/');
+    revalidatePath('/admin/cafes');
 
     return NextResponse.json({ message: 'Cafe deleted successfully' });
   } catch (error) {
