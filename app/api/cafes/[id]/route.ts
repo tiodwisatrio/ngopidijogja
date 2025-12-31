@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 
@@ -35,10 +34,10 @@ export async function GET(
       );
     }
 
-    // Cache individual cafe details for 5 minutes
+    // NO CACHE - always return fresh data
     return NextResponse.json(cafe, {
       headers: {
-        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
       },
     });
   } catch (error) {
@@ -85,13 +84,11 @@ export async function PUT(
       },
     });
 
-    // Revalidate cache after update
-    revalidatePath('/');
-    revalidatePath('/admin/cafes');
-    revalidatePath(`/admin/cafes/${id}`);
-    revalidatePath(`/api/cafes/${id}`);
-
-    return NextResponse.json(cafe);
+    return NextResponse.json(cafe, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+      },
+    });
   } catch (error) {
     console.error('Error updating cafe:', error);
     return NextResponse.json(
@@ -113,11 +110,11 @@ export async function DELETE(
       where: { id: parseInt(id) },
     });
 
-    // Revalidate cache after delete
-    revalidatePath('/');
-    revalidatePath('/admin/cafes');
-
-    return NextResponse.json({ message: 'Cafe deleted successfully' });
+    return NextResponse.json({ message: 'Cafe deleted successfully' }, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+      },
+    });
   } catch (error) {
     console.error('Error deleting cafe:', error);
     return NextResponse.json(

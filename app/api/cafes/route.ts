@@ -45,10 +45,10 @@ export async function GET() {
       },
     });
 
-    // Cache response for 60 seconds with stale-while-revalidate
+    // NO CACHE - always return fresh data
     return NextResponse.json(cafes, {
       headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
+        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
       },
     });
   } catch (error) {
