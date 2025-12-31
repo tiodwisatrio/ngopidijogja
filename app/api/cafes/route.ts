@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 // GET all cafes (optimized for map view - excludes heavy data)
 export async function GET() {
@@ -69,8 +70,8 @@ export async function POST(request: NextRequest) {
         slug: body.slug,
         name: body.name,
         address: body.address,
-        latitude: body.latitude ? parseFloat(body.latitude) : null,
-        longitude: body.longitude ? parseFloat(body.longitude) : null,
+        latitude: body.latitude ? new Prisma.Decimal(body.latitude) : null,
+        longitude: body.longitude ? new Prisma.Decimal(body.longitude) : null,
         googleMapsUrl: body.googleMapsUrl,
         instagramUrl: body.instagramUrl,
         instagramUsername: body.instagramUsername,

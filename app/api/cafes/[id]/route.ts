@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 // GET cafe by ID
 export async function GET(
@@ -62,8 +63,8 @@ export async function PUT(
       data: {
         name: body.name,
         address: body.address,
-        latitude: body.latitude ? parseFloat(body.latitude) : undefined,
-        longitude: body.longitude ? parseFloat(body.longitude) : undefined,
+        latitude: body.latitude ? new Prisma.Decimal(body.latitude) : undefined,
+        longitude: body.longitude ? new Prisma.Decimal(body.longitude) : undefined,
         googleMapsUrl: body.googleMapsUrl,
         instagramUrl: body.instagramUrl,
         instagramUsername: body.instagramUsername,
