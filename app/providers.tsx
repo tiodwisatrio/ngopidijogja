@@ -2,7 +2,14 @@
 
 import { SessionProvider } from 'next-auth/react';
 import React from 'react';
+import { FavoriteProvider } from '@/contexts/FavoriteContext';
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  return <SessionProvider>{children}</SessionProvider>;
+  return (
+    <SessionProvider>
+      <FavoriteProvider>
+        {children}
+      </FavoriteProvider>
+    </SessionProvider>
+  );
 }

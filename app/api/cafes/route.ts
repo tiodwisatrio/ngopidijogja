@@ -14,9 +14,21 @@ export async function GET() {
         latitude: true,
         longitude: true,
         parking: true,
+        priceMin: true,
+        priceMax: true,
+        priceRange: true,
         googleMapsUrl: true,
         instagramUrl: true,
         instagramUsername: true,
+        mainImageId: true,
+        // Include images for CafeCard display
+        images: {
+          select: {
+            id: true,
+            imageUrl: true,
+            alt: true,
+          },
+        },
         // Only include essential relations for map markers
         paymentMethods: {
           select: {
@@ -40,8 +52,7 @@ export async function GET() {
             },
           },
         },
-        // Exclude images and openingHours - too heavy for initial load
-        // These will be fetched separately when detail sheet is opened
+        // Exclude openingHours - will be fetched when detail sheet is opened
       },
     });
 

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import FavoriteButton from "./FavoriteButton";
 
 interface PaymentMethod {
   paymentMethod: {
@@ -47,7 +48,7 @@ interface Cafe {
   priceMax?: number | null;
   priceRange?: string | null;
   slug: string;
-  googleMapsUrl?: string;
+  googleMapsUrl?: string | null;
   paymentMethods?: PaymentMethod[];
   mainImageId?: string | null;
   images?: CafeImage[];
@@ -504,14 +505,19 @@ export default function CafeDetailSheet({
 
               {/* Right Column: Details */}
               <div className="md:col-span-1 space-y-6">
-                {/* Header */}
+                {/* Header with Favorite Button */}
                 <div className="space-y-2 px-6 md:px-0">
-                  <h2 className="text-2xl md:text-3xl font-bold text-[#803D3B]">
-                    {cafe.name}
-                  </h2>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    {cafe.address}
-                  </p>
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <h2 className="text-2xl md:text-3xl font-bold text-[#803D3B]">
+                        {cafe.name}
+                      </h2>
+                      <p className="text-gray-600 text-sm leading-relaxed mt-2">
+                        {cafe.address}
+                      </p>
+                    </div>
+                    <FavoriteButton cafeId={cafe.id} size="lg" />
+                  </div>
                 </div>
 
                 {/* Instagram Link */}

@@ -242,6 +242,7 @@ export default function HomePage() {
               cafes={filteredCafes}
               selectedCafeId={selectedCafeId}
               onCafeClick={(cafe) => setSelectedCafeId(cafe.id)}
+              userLocation={userLocation}
             />
 
             {/* Result Counter */}
