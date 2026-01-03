@@ -1,20 +1,21 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/api-auth";
 
 // GET all facilities
 export async function GET() {
   try {
     const facilities = await prisma.facility.findMany({
       orderBy: {
-        label: 'asc',
+        label: "asc",
       },
     });
 
     return NextResponse.json(facilities);
   } catch (error) {
-    console.error('Error fetching facilities:', error);
+    console.error("Error fetching facilities:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch facilities', details: String(error) },
+      { error: "Failed to fetch facilities", details: String(error) },
       { status: 500 }
     );
   }
@@ -22,13 +23,17 @@ export async function GET() {
 
 // POST create new facility
 export async function POST(request: NextRequest) {
+  // Require admin authorization
+  const { error } = await requireAdmin(request);
+  if (error) return error;
+
   try {
     const body = await request.json();
 
     // Validate required fields
     if (!body.code || !body.label) {
       return NextResponse.json(
-        { error: 'Code and label are required' },
+        { error: "Code and label are required" },
         { status: 400 }
       );
     }
@@ -43,9 +48,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(facility, { status: 201 });
   } catch (error) {
-    console.error('Error creating facility:', error);
+    console.error("Error creating facility:", error);
     return NextResponse.json(
-      { error: 'Failed to create facility', details: String(error) },
+      { error: "Failed to create facility", details: String(error) },
       { status: 500 }
     );
   }

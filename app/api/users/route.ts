@@ -1,9 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import bcrypt from 'bcrypt';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import bcrypt from "bcrypt";
+import { requireAdmin } from "@/lib/api-auth";
 
 // GET all users
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Require admin authorization
+  const { error } = await requireAdmin(request);
+  if (error) return error;
+
   try {
     const users = await prisma.user.findMany({
       select: {
@@ -16,15 +21,15 @@ export async function GET() {
         // Exclude password from response
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
     });
 
     return NextResponse.json(users);
   } catch (error) {
-    console.error('Error fetching users:', error);
+    console.error("Error fetching users:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch users', details: String(error) },
+      { error: "Failed to fetch users", details: String(error) },
       { status: 500 }
     );
   }
@@ -32,13 +37,17 @@ export async function GET() {
 
 // POST create new user (admin)
 export async function POST(request: NextRequest) {
+  // Require admin authorization
+  const { error } = await requireAdmin(request);
+  if (error) return error;
+
   try {
     const body = await request.json();
 
     // Validation
     if (!body.email || !body.password) {
       return NextResponse.json(
-        { error: 'Email and password are required' },
+        { error: "Email and password are required" },
         { status: 400 }
       );
     }
@@ -47,7 +56,7 @@ export async function POST(request: NextRequest) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(body.email)) {
       return NextResponse.json(
-        { error: 'Invalid email format' },
+        { error: "Invalid email format" },
         { status: 400 }
       );
     }
@@ -55,7 +64,7 @@ export async function POST(request: NextRequest) {
     // Password strength validation (min 8 characters)
     if (body.password.length < 8) {
       return NextResponse.json(
-        { error: 'Password must be at least 8 characters long' },
+        { error: "Password must be at least 8 characters long" },
         { status: 400 }
       );
     }
@@ -67,7 +76,7 @@ export async function POST(request: NextRequest) {
 
     if (existingUser) {
       return NextResponse.json(
-        { error: 'Email already exists' },
+        { error: "Email already exists" },
         { status: 409 }
       );
     }
@@ -81,7 +90,7 @@ export async function POST(request: NextRequest) {
         email: body.email,
         password: hashedPassword,
         name: body.name || null,
-        role: body.role || 'admin',
+        role: body.role || "admin",
       },
       select: {
         id: true,
@@ -95,9 +104,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(user, { status: 201 });
   } catch (error) {
-    console.error('Error creating user:', error);
+    console.error("Error creating user:", error);
     return NextResponse.json(
-      { error: 'Failed to create user', details: String(error) },
+      { error: "Failed to create user", details: String(error) },
       { status: 500 }
     );
   }

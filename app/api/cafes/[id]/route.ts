@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { Prisma } from '@prisma/client';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
+import { requireAdmin } from "@/lib/api-auth";
 
 // GET cafe by ID
 export async function GET(
@@ -28,22 +29,19 @@ export async function GET(
     });
 
     if (!cafe) {
-      return NextResponse.json(
-        { error: 'Cafe not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Cafe not found" }, { status: 404 });
     }
 
     // NO CACHE - always return fresh data
     return NextResponse.json(cafe, {
       headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
       },
     });
   } catch (error) {
-    console.error('Error fetching cafe:', error);
+    console.error("Error fetching cafe:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch cafe' },
+      { error: "Failed to fetch cafe" },
       { status: 500 }
     );
   }
@@ -54,6 +52,10 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Require admin authorization
+  const { error } = await requireAdmin(request);
+  if (error) return error;
+
   try {
     const { id } = await params;
     const body = await request.json();
@@ -64,7 +66,9 @@ export async function PUT(
         name: body.name,
         address: body.address,
         latitude: body.latitude ? new Prisma.Decimal(body.latitude) : undefined,
-        longitude: body.longitude ? new Prisma.Decimal(body.longitude) : undefined,
+        longitude: body.longitude
+          ? new Prisma.Decimal(body.longitude)
+          : undefined,
         googleMapsUrl: body.googleMapsUrl,
         instagramUrl: body.instagramUrl,
         instagramUsername: body.instagramUsername,
@@ -86,13 +90,13 @@ export async function PUT(
 
     return NextResponse.json(cafe, {
       headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
       },
     });
   } catch (error) {
-    console.error('Error updating cafe:', error);
+    console.error("Error updating cafe:", error);
     return NextResponse.json(
-      { error: 'Failed to update cafe' },
+      { error: "Failed to update cafe" },
       { status: 500 }
     );
   }
@@ -103,6 +107,10 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Require admin authorization
+  const { error } = await requireAdmin(request);
+  if (error) return error;
+
   try {
     const { id } = await params;
 
@@ -110,15 +118,18 @@ export async function DELETE(
       where: { id: parseInt(id) },
     });
 
-    return NextResponse.json({ message: 'Cafe deleted successfully' }, {
-      headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
-      },
-    });
-  } catch (error) {
-    console.error('Error deleting cafe:', error);
     return NextResponse.json(
-      { error: 'Failed to delete cafe' },
+      { message: "Cafe deleted successfully" },
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+        },
+      }
+    );
+  } catch (error) {
+    console.error("Error deleting cafe:", error);
+    return NextResponse.json(
+      { error: "Failed to delete cafe" },
       { status: 500 }
     );
   }

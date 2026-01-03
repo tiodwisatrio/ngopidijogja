@@ -1,14 +1,20 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import bcrypt from 'bcrypt';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import bcrypt from "bcrypt";
+import { requireOwnerOrAdmin, requireAdmin } from "@/lib/api-auth";
 
 // GET user by ID
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
+
+    // Check if user can access this resource (owner or admin)
+    const { error } = await requireOwnerOrAdmin(request, id);
+    if (error) return error;
+
     const user = await prisma.user.findUnique({
       where: { id: id },
       select: {
@@ -22,17 +28,14 @@ export async function GET(
     });
 
     if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     return NextResponse.json(user);
   } catch (error) {
-    console.error('Error fetching user:', error);
+    console.error("Error fetching user:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch user' },
+      { error: "Failed to fetch user" },
       { status: 500 }
     );
   }
@@ -45,6 +48,11 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
+
+    // Check if user can access this resource (owner or admin)
+    const { session, error } = await requireOwnerOrAdmin(request, id);
+    if (error) return error;
+
     const body = await request.json();
 
     // Build update data object
@@ -60,7 +68,7 @@ export async function PUT(
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(body.email)) {
         return NextResponse.json(
-          { error: 'Invalid email format' },
+          { error: "Invalid email format" },
           { status: 400 }
         );
       }
@@ -75,7 +83,7 @@ export async function PUT(
 
       if (existingUser) {
         return NextResponse.json(
-          { error: 'Email already exists' },
+          { error: "Email already exists" },
           { status: 409 }
         );
       }
@@ -88,6 +96,13 @@ export async function PUT(
     }
 
     if (body.role) {
+      // Only admin can change user roles
+      if (session!.user.role !== "admin") {
+        return NextResponse.json(
+          { error: "Forbidden - Only admin can change user roles" },
+          { status: 403 }
+        );
+      }
       updateData.role = body.role;
     }
 
@@ -95,7 +110,7 @@ export async function PUT(
     if (body.password) {
       if (body.password.length < 8) {
         return NextResponse.json(
-          { error: 'Password must be at least 8 characters long' },
+          { error: "Password must be at least 8 characters long" },
           { status: 400 }
         );
       }
@@ -117,9 +132,9 @@ export async function PUT(
 
     return NextResponse.json(user);
   } catch (error) {
-    console.error('Error updating user:', error);
+    console.error("Error updating user:", error);
     return NextResponse.json(
-      { error: 'Failed to update user' },
+      { error: "Failed to update user" },
       { status: 500 }
     );
   }
@@ -127,9 +142,13 @@ export async function PUT(
 
 // DELETE user by ID
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Only admin can delete users
+  const { error } = await requireAdmin(request);
+  if (error) return error;
+
   try {
     const { id } = await params;
 
@@ -139,7 +158,7 @@ export async function DELETE(
     // Prevent deleting the last admin
     if (totalUsers <= 1) {
       return NextResponse.json(
-        { error: 'Cannot delete the last admin user' },
+        { error: "Cannot delete the last admin user" },
         { status: 403 }
       );
     }
@@ -148,11 +167,11 @@ export async function DELETE(
       where: { id: id },
     });
 
-    return NextResponse.json({ message: 'User deleted successfully' });
+    return NextResponse.json({ message: "User deleted successfully" });
   } catch (error) {
-    console.error('Error deleting user:', error);
+    console.error("Error deleting user:", error);
     return NextResponse.json(
-      { error: 'Failed to delete user' },
+      { error: "Failed to delete user" },
       { status: 500 }
     );
   }

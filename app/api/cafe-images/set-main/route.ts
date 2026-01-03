@@ -1,15 +1,20 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/api-auth";
 
 // PUT set main image for cafe
 export async function PUT(request: NextRequest) {
+  // Require admin authorization
+  const { error } = await requireAdmin(request);
+  if (error) return error;
+
   try {
     const body = await request.json();
     const { cafeId, imageId } = body;
 
     if (!cafeId || !imageId) {
       return NextResponse.json(
-        { error: 'cafeId and imageId are required' },
+        { error: "cafeId and imageId are required" },
         { status: 400 }
       );
     }
@@ -24,9 +29,9 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(cafe);
   } catch (error) {
-    console.error('Error setting main image:', error);
+    console.error("Error setting main image:", error);
     return NextResponse.json(
-      { error: 'Failed to set main image', details: String(error) },
+      { error: "Failed to set main image", details: String(error) },
       { status: 500 }
     );
   }

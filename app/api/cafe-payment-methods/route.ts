@@ -1,15 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/api-auth";
 
 // GET payment methods for a cafe
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const cafeId = searchParams.get('cafeId');
+    const cafeId = searchParams.get("cafeId");
 
     if (!cafeId) {
       return NextResponse.json(
-        { error: 'cafeId query parameter is required' },
+        { error: "cafeId query parameter is required" },
         { status: 400 }
       );
     }
@@ -23,9 +24,9 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(paymentMethods);
   } catch (error) {
-    console.error('Error fetching cafe payment methods:', error);
+    console.error("Error fetching cafe payment methods:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch cafe payment methods' },
+      { error: "Failed to fetch cafe payment methods" },
       { status: 500 }
     );
   }
@@ -33,6 +34,10 @@ export async function GET(request: NextRequest) {
 
 // POST add payment method to cafe
 export async function POST(request: NextRequest) {
+  // Require admin authorization
+  const { error } = await requireAdmin(request);
+  if (error) return error;
+
   try {
     const body = await request.json();
 
@@ -48,9 +53,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(cafePaymentMethod, { status: 201 });
   } catch (error) {
-    console.error('Error adding payment method to cafe:', error);
+    console.error("Error adding payment method to cafe:", error);
     return NextResponse.json(
-      { error: 'Failed to add payment method to cafe' },
+      { error: "Failed to add payment method to cafe" },
       { status: 500 }
     );
   }
@@ -58,14 +63,18 @@ export async function POST(request: NextRequest) {
 
 // DELETE remove payment method from cafe
 export async function DELETE(request: NextRequest) {
+  // Require admin authorization
+  const { error } = await requireAdmin(request);
+  if (error) return error;
+
   try {
     const searchParams = request.nextUrl.searchParams;
-    const cafeId = searchParams.get('cafeId');
-    const paymentMethodId = searchParams.get('paymentMethodId');
+    const cafeId = searchParams.get("cafeId");
+    const paymentMethodId = searchParams.get("paymentMethodId");
 
     if (!cafeId || !paymentMethodId) {
       return NextResponse.json(
-        { error: 'cafeId and paymentMethodId query parameters are required' },
+        { error: "cafeId and paymentMethodId query parameters are required" },
         { status: 400 }
       );
     }
@@ -79,11 +88,11 @@ export async function DELETE(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({ message: 'Payment method removed from cafe' });
+    return NextResponse.json({ message: "Payment method removed from cafe" });
   } catch (error) {
-    console.error('Error removing payment method from cafe:', error);
+    console.error("Error removing payment method from cafe:", error);
     return NextResponse.json(
-      { error: 'Failed to remove payment method from cafe' },
+      { error: "Failed to remove payment method from cafe" },
       { status: 500 }
     );
   }

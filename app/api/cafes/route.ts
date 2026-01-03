@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { Prisma } from '@prisma/client';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
+import { requireAdmin } from "@/lib/api-auth";
 
 // GET all cafes (optimized for map view - excludes heavy data)
 export async function GET() {
@@ -59,13 +60,13 @@ export async function GET() {
     // NO CACHE - always return fresh data
     return NextResponse.json(cafes, {
       headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
       },
     });
   } catch (error) {
-    console.error('Error fetching cafes:', error);
+    console.error("Error fetching cafes:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch cafes', details: String(error) },
+      { error: "Failed to fetch cafes", details: String(error) },
       { status: 500 }
     );
   }
@@ -73,6 +74,10 @@ export async function GET() {
 
 // POST create new cafe
 export async function POST(request: NextRequest) {
+  // Require admin authorization
+  const { error } = await requireAdmin(request);
+  if (error) return error;
+
   try {
     const body = await request.json();
 
@@ -109,9 +114,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(cafe, { status: 201 });
   } catch (error) {
-    console.error('Error creating cafe:', error);
+    console.error("Error creating cafe:", error);
     return NextResponse.json(
-      { error: 'Failed to create cafe', details: String(error) },
+      { error: "Failed to create cafe", details: String(error) },
       { status: 500 }
     );
   }
