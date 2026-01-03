@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 interface Cafe {
   id: string;
@@ -18,11 +18,19 @@ interface OpeningHour {
   isEverydayOpen?: boolean;
 }
 
-const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const DAYS = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
 
 export default function OpeningHoursPage() {
   const [cafes, setCafes] = useState<Cafe[]>([]);
-  const [selectedCafeId, setSelectedCafeId] = useState('');
+  const [selectedCafeId, setSelectedCafeId] = useState("");
   const [hours, setHours] = useState<OpeningHour[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -39,8 +47,8 @@ export default function OpeningHoursPage() {
 
   const fetchCafes = async () => {
     try {
-      const res = await fetch('/api/cafes');
-      if (!res.ok) throw new Error('Failed to fetch');
+      const res = await fetch("/api/cafes");
+      if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
       const cafeList = Array.isArray(data) ? data : [];
       setCafes(cafeList);
@@ -48,19 +56,39 @@ export default function OpeningHoursPage() {
         setSelectedCafeId(cafeList[0].id);
       }
     } catch (err) {
-      console.error('Failed to load cafes:', err);
+      console.error("Failed to load cafes:", err);
     }
+  };
+
+  // Extract time from ISO string without timezone conversion
+  const formatTimeForInput = (dateTimeString: string): string => {
+    if (!dateTimeString) return "09:00";
+    // Parse the ISO string and extract UTC time (no conversion)
+    const date = new Date(dateTimeString);
+    const hours = String(date.getUTCHours()).padStart(2, '0');
+    const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
   };
 
   const fetchHours = async (cafeId: string) => {
     setLoading(true);
     try {
       const res = await fetch(`/api/opening-hours?cafeId=${cafeId}`);
-      if (!res.ok) throw new Error('Failed to fetch');
+      if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
-      setHours(Array.isArray(data) ? data : []);
+
+      // Convert DateTime to HH:MM format for display
+      const formattedData = Array.isArray(data)
+        ? data.map((h: OpeningHour) => ({
+            ...h,
+            openTime: formatTimeForInput(h.openTime),
+            closeTime: formatTimeForInput(h.closeTime),
+          }))
+        : [];
+
+      setHours(formattedData);
     } catch (err) {
-      console.error('Failed to load hours:', err);
+      console.error("Failed to load hours:", err);
     } finally {
       setLoading(false);
     }
@@ -82,8 +110,8 @@ export default function OpeningHoursPage() {
           id: `new-${dayOfWeek}`,
           cafeId: selectedCafeId,
           dayOfWeek,
-          openTime: '09:00',
-          closeTime: '18:00',
+          openTime: "09:00",
+          closeTime: "18:00",
           isClosed: false,
           isOpen24Hours: false,
           isEverydayOpen: false,
@@ -93,22 +121,40 @@ export default function OpeningHoursPage() {
     }
   };
 
+  // No conversion - send time as-is
+  // Database stores time, frontend handles timezone display
+  const prepareTimeForSave = (timeString: string): string => {
+    if (!timeString) return "00:00";
+    return timeString; // Send as-is (HH:MM format)
+  };
+
   const handleSave = async () => {
     if (!selectedCafeId) return;
 
     setSaving(true);
     try {
       for (const hour of hours) {
-        if (hour.id.startsWith('new-')) {
+        // Send time as-is (no timezone conversion)
+        const openTime = prepareTimeForSave(hour.openTime);
+        const closeTime = prepareTimeForSave(hour.closeTime);
+
+        console.log("Saving hour:", {
+          day: hour.dayOfWeek,
+          openTime: openTime,
+          closeTime: closeTime,
+        });
+
+        let response;
+        if (typeof hour.id === "string" && hour.id.startsWith("new-")) {
           // Create new
-          await fetch('/api/opening-hours', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+          response = await fetch("/api/opening-hours", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               cafeId: selectedCafeId,
               dayOfWeek: hour.dayOfWeek,
-              openTime: hour.openTime,
-              closeTime: hour.closeTime,
+              openTime: openTime,
+              closeTime: closeTime,
               isClosed: hour.isClosed,
               isOpen24Hours: hour.isOpen24Hours || false,
               isEverydayOpen: hour.isEverydayOpen || false,
@@ -116,24 +162,35 @@ export default function OpeningHoursPage() {
           });
         } else {
           // Update existing
-          await fetch('/api/opening-hours', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+          response = await fetch("/api/opening-hours", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               id: hour.id,
-              openTime: hour.openTime,
-              closeTime: hour.closeTime,
+              openTime: openTime,
+              closeTime: closeTime,
               isClosed: hour.isClosed,
               isOpen24Hours: hour.isOpen24Hours || false,
               isEverydayOpen: hour.isEverydayOpen || false,
             }),
           });
         }
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error("API error:", errorData);
+          throw new Error(`API error: ${errorData.error || "Unknown error"}`);
+        }
       }
-      alert('Opening hours saved!');
+      alert("Opening hours saved!");
       fetchHours(selectedCafeId);
     } catch (err) {
-      alert('Failed to save opening hours');
+      console.error("Save error:", err);
+      alert(
+        `Failed to save opening hours: ${
+          err instanceof Error ? err.message : "Unknown error"
+        }`
+      );
     } finally {
       setSaving(false);
     }
@@ -175,7 +232,10 @@ export default function OpeningHoursPage() {
               const hour = hours.find((h) => h.dayOfWeek === day);
 
               return (
-                <div key={day} className="pb-6 border-b border-gray-200 last:border-b-0">
+                <div
+                  key={day}
+                  className="pb-6 border-b border-gray-200 last:border-b-0"
+                >
                   <div className="flex items-center gap-6 pb-4">
                     <div className="w-24 font-medium text-gray-900">{day}</div>
 
@@ -185,24 +245,34 @@ export default function OpeningHoursPage() {
                           <div className="flex items-center gap-2">
                             <input
                               type="time"
-                              value={hour?.openTime || '09:00'}
+                              value={hour?.openTime || "09:00"}
                               onChange={(e) =>
-                                handleHourChange(day, 'openTime', e.target.value)
+                                handleHourChange(
+                                  day,
+                                  "openTime",
+                                  e.target.value
+                                )
                               }
                               className="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                             <span className="text-gray-600">to</span>
                             <input
                               type="time"
-                              value={hour?.closeTime || '18:00'}
+                              value={hour?.closeTime || "18:00"}
                               onChange={(e) =>
-                                handleHourChange(day, 'closeTime', e.target.value)
+                                handleHourChange(
+                                  day,
+                                  "closeTime",
+                                  e.target.value
+                                )
                               }
                               className="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                           </div>
                         ) : (
-                          <div className="text-blue-600 font-medium">24 Hours</div>
+                          <div className="text-blue-600 font-medium">
+                            24 Hours
+                          </div>
                         )}
                       </>
                     ) : (
@@ -217,7 +287,11 @@ export default function OpeningHoursPage() {
                         type="checkbox"
                         checked={hour?.isOpen24Hours || false}
                         onChange={(e) =>
-                          handleHourChange(day, 'isOpen24Hours', e.target.checked)
+                          handleHourChange(
+                            day,
+                            "isOpen24Hours",
+                            e.target.checked
+                          )
                         }
                         className="w-4 h-4 rounded border-gray-300"
                       />
@@ -229,11 +303,17 @@ export default function OpeningHoursPage() {
                         type="checkbox"
                         checked={hour?.isEverydayOpen || false}
                         onChange={(e) =>
-                          handleHourChange(day, 'isEverydayOpen', e.target.checked)
+                          handleHourChange(
+                            day,
+                            "isEverydayOpen",
+                            e.target.checked
+                          )
                         }
                         className="w-4 h-4 rounded border-gray-300"
                       />
-                      <span className="text-sm text-gray-700">Same as all days</span>
+                      <span className="text-sm text-gray-700">
+                        Same as all days
+                      </span>
                     </label>
 
                     <label className="flex items-center gap-2 ml-auto">
@@ -241,7 +321,7 @@ export default function OpeningHoursPage() {
                         type="checkbox"
                         checked={hour?.isClosed || false}
                         onChange={(e) =>
-                          handleHourChange(day, 'isClosed', e.target.checked)
+                          handleHourChange(day, "isClosed", e.target.checked)
                         }
                         className="w-4 h-4 rounded border-gray-300"
                       />
@@ -259,7 +339,7 @@ export default function OpeningHoursPage() {
               disabled={saving}
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400"
             >
-              {saving ? 'Saving...' : 'Save Opening Hours'}
+              {saving ? "Saving..." : "Save Opening Hours"}
             </button>
           </div>
         </div>

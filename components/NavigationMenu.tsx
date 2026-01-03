@@ -21,7 +21,7 @@ export default function NavigationMenu({
     <>
       {/* Desktop Navigation - Right Center */}
       <div
-        className="nav-menu-container hidden md:flex fixed top-1/2 -translate-y-1/2 flex-col gap-3 bg-white rounded-full p-3 shadow-xl border border-gray-100"
+        className="nav-menu-container hidden md:flex fixed top-1/2 -translate-y-1/2 flex-col py-2 gap-3 bg-white rounded-full p-3 shadow-xl border border-gray-100"
         style={{ zIndex: 9999, right: "24px" }}
       >
         <button

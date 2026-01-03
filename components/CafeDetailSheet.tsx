@@ -601,17 +601,22 @@ export default function CafeDetailSheet({
                 {cafe?.openingHours &&
                   cafe.openingHours.length > 0 &&
                   (() => {
-                    // Helper function to format time from Date or string
+                    // Helper function to format time from Date or string (no timezone conversion)
                     const formatTime = (time: string | Date): string => {
                       if (typeof time === "string") {
                         // If string, extract HH:MM from ISO format or return as is
                         if (time.includes("T")) {
-                          return new Date(time).toTimeString().slice(0, 5);
+                          const date = new Date(time);
+                          const hours = String(date.getUTCHours()).padStart(2, '0');
+                          const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+                          return `${hours}:${minutes}`;
                         }
                         return time.slice(0, 5);
                       }
-                      // If Date object, convert to HH:MM
-                      return time.toTimeString().slice(0, 5);
+                      // If Date object, use UTC to avoid timezone conversion
+                      const hours = String(time.getUTCHours()).padStart(2, '0');
+                      const minutes = String(time.getUTCMinutes()).padStart(2, '0');
+                      return `${hours}:${minutes}`;
                     };
 
                     // Indonesian day name mapping
@@ -624,6 +629,12 @@ export default function CafeDetailSheet({
                       Saturday: "Sabtu",
                       Sunday: "Minggu",
                     };
+
+                    // Sort opening hours by Indonesian week order (Senin - Minggu)
+                    const dayOrder = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+                    const sortedHours = [...cafe.openingHours].sort((a, b) => {
+                      return dayOrder.indexOf(a.dayOfWeek) - dayOrder.indexOf(b.dayOfWeek);
+                    });
 
                     // Get current day in English
                     const currentDayEnglish = new Date().toLocaleDateString(
@@ -687,7 +698,7 @@ export default function CafeDetailSheet({
                           </span>
                         </div>
                         <div className="bg-gray-50 border border-gray-200 rounded-xl overflow-hidden">
-                          {cafe.openingHours.map((hour) => {
+                          {sortedHours.map((hour) => {
                             const isToday =
                               hour.dayOfWeek === currentDayEnglish;
                             const dayIndonesian =

@@ -33,15 +33,16 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    // Parse time strings in HH:MM format to Time type
+    // Parse time strings in HH:MM format
     const [openHours, openMinutes] = body.openTime.split(':').map(Number);
     const [closeHours, closeMinutes] = body.closeTime.split(':').map(Number);
 
+    // Store exact time without timezone conversion
     const openTime = new Date();
-    openTime.setHours(openHours, openMinutes, 0, 0);
+    openTime.setUTCHours(openHours, openMinutes, 0, 0);
 
     const closeTime = new Date();
-    closeTime.setHours(closeHours, closeMinutes, 0, 0);
+    closeTime.setUTCHours(closeHours, closeMinutes, 0, 0);
 
     const openingHour = await prisma.openingHour.create({
       data: {
@@ -70,15 +71,16 @@ export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
 
-    // Parse time strings in HH:MM format to Time type
+    // Parse time strings in HH:MM format
     const [openHours, openMinutes] = body.openTime.split(':').map(Number);
     const [closeHours, closeMinutes] = body.closeTime.split(':').map(Number);
 
+    // Store exact time without timezone conversion
     const openTime = new Date();
-    openTime.setHours(openHours, openMinutes, 0, 0);
+    openTime.setUTCHours(openHours, openMinutes, 0, 0);
 
     const closeTime = new Date();
-    closeTime.setHours(closeHours, closeMinutes, 0, 0);
+    closeTime.setUTCHours(closeHours, closeMinutes, 0, 0);
 
     const openingHour = await prisma.openingHour.update({
       where: { id: parseInt(body.id) },

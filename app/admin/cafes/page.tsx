@@ -1,7 +1,8 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import Pagination from "@/components/Pagination";
 
 interface Cafe {
   id: string;
@@ -12,10 +13,13 @@ interface Cafe {
   parking: string;
 }
 
+const ITEMS_PER_PAGE = 10;
+
 export default function CafesPage() {
   const [cafes, setCafes] = useState<Cafe[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     fetchCafes();
@@ -23,12 +27,12 @@ export default function CafesPage() {
 
   const fetchCafes = async () => {
     try {
-      const res = await fetch('/api/cafes');
-      if (!res.ok) throw new Error('Failed to fetch');
+      const res = await fetch("/api/cafes");
+      if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
       setCafes(Array.isArray(data) ? data : []);
     } catch (err) {
-      setError('Failed to load cafes');
+      setError("Failed to load cafes");
       console.error(err);
     } finally {
       setLoading(false);
@@ -36,15 +40,26 @@ export default function CafesPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this cafe?')) return;
+    if (!confirm("Are you sure you want to delete this cafe?")) return;
 
     try {
-      const res = await fetch(`/api/cafes/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Failed to delete');
+      const res = await fetch(`/api/cafes/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete");
       setCafes(cafes.filter((c) => c.id !== id));
     } catch (err) {
-      alert('Failed to delete cafe');
+      alert("Failed to delete cafe");
     }
+  };
+
+  // Pagination calculations
+  const totalPages = Math.ceil(cafes.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const currentCafes = cafes.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -76,14 +91,12 @@ export default function CafesPage() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
+                <th className="text-center px-6 py-3 font-semibold">No</th>
                 <th className="text-left px-6 py-3 font-semibold text-gray-900">
                   Name
                 </th>
                 <th className="text-left px-6 py-3 font-semibold text-gray-900">
                   Address
-                </th>
-                <th className="text-left px-6 py-3 font-semibold text-gray-900">
-                  WiFi
                 </th>
                 <th className="text-left px-6 py-3 font-semibold text-gray-900">
                   Parking
@@ -94,11 +107,14 @@ export default function CafesPage() {
               </tr>
             </thead>
             <tbody>
-              {cafes.map((cafe) => (
+              {currentCafes.map((cafe) => (
                 <tr
                   key={cafe.id}
                   className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
                 >
+                  <td className="text-center px-6 py-4">
+                    {startIndex + currentCafes.indexOf(cafe) + 1}
+                  </td>
                   <td className="px-6 py-4">
                     <p className="font-semibold text-gray-900">{cafe.name}</p>
                     <p className="text-sm text-gray-600">{cafe.slug}</p>
@@ -106,19 +122,9 @@ export default function CafesPage() {
                   <td className="px-6 py-4 text-sm text-gray-700">
                     {cafe.address}
                   </td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        cafe.wifi
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}
-                    >
-                      {cafe.wifi ? '✓ Yes' : '✗ No'}
-                    </span>
-                  </td>
+
                   <td className="px-6 py-4 text-sm text-gray-700">
-                    {cafe.parking || 'N/A'}
+                    {cafe.parking || "N/A"}
                   </td>
                   <td className="px-6 py-4 flex gap-2">
                     <Link
@@ -144,6 +150,13 @@ export default function CafesPage() {
               ))}
             </tbody>
           </table>
+
+          {/* Pagination */}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
         </div>
       )}
     </div>
