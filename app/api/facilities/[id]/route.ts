@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/api-auth";
 
 // GET single facility
 export async function GET(
@@ -26,16 +27,16 @@ export async function GET(
 
     if (!facility) {
       return NextResponse.json(
-        { error: 'Facility not found' },
+        { error: "Facility not found" },
         { status: 404 }
       );
     }
 
     return NextResponse.json(facility);
   } catch (error) {
-    console.error('Error fetching facility:', error);
+    console.error("Error fetching facility:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch facility', details: String(error) },
+      { error: "Failed to fetch facility", details: String(error) },
       { status: 500 }
     );
   }
@@ -46,6 +47,10 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Require admin authorization
+  const { error } = await requireAdmin(request);
+  if (error) return error;
+
   try {
     const { id } = await params;
     const body = await request.json();
@@ -61,9 +66,9 @@ export async function PUT(
 
     return NextResponse.json(facility);
   } catch (error) {
-    console.error('Error updating facility:', error);
+    console.error("Error updating facility:", error);
     return NextResponse.json(
-      { error: 'Failed to update facility', details: String(error) },
+      { error: "Failed to update facility", details: String(error) },
       { status: 500 }
     );
   }
@@ -74,6 +79,10 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Require admin authorization
+  const { error } = await requireAdmin(request);
+  if (error) return error;
+
   try {
     const { id } = await params;
 
@@ -81,11 +90,11 @@ export async function DELETE(
       where: { id: parseInt(id) },
     });
 
-    return NextResponse.json({ message: 'Facility deleted successfully' });
+    return NextResponse.json({ message: "Facility deleted successfully" });
   } catch (error) {
-    console.error('Error deleting facility:', error);
+    console.error("Error deleting facility:", error);
     return NextResponse.json(
-      { error: 'Failed to delete facility', details: String(error) },
+      { error: "Failed to delete facility", details: String(error) },
       { status: 500 }
     );
   }

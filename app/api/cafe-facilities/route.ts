@@ -1,15 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/api-auth";
 
 // GET cafe facilities by cafeId
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const cafeId = searchParams.get('cafeId');
+    const cafeId = searchParams.get("cafeId");
 
     if (!cafeId) {
       return NextResponse.json(
-        { error: 'cafeId is required' },
+        { error: "cafeId is required" },
         { status: 400 }
       );
     }
@@ -23,9 +24,9 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(cafeFacilities);
   } catch (error) {
-    console.error('Error fetching cafe facilities:', error);
+    console.error("Error fetching cafe facilities:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch cafe facilities', details: String(error) },
+      { error: "Failed to fetch cafe facilities", details: String(error) },
       { status: 500 }
     );
   }
@@ -33,13 +34,17 @@ export async function GET(request: NextRequest) {
 
 // POST bulk update cafe facilities
 export async function POST(request: NextRequest) {
+  // Require admin authorization
+  const { error } = await requireAdmin(request);
+  if (error) return error;
+
   try {
     const body = await request.json();
     const { cafeId, facilityIds } = body;
 
     if (!cafeId) {
       return NextResponse.json(
-        { error: 'cafeId is required' },
+        { error: "cafeId is required" },
         { status: 400 }
       );
     }
@@ -69,9 +74,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(cafeFacilities);
   } catch (error) {
-    console.error('Error updating cafe facilities:', error);
+    console.error("Error updating cafe facilities:", error);
     return NextResponse.json(
-      { error: 'Failed to update cafe facilities', details: String(error) },
+      { error: "Failed to update cafe facilities", details: String(error) },
       { status: 500 }
     );
   }

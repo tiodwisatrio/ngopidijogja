@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/api-auth";
 
 // GET all payment methods
 export async function GET() {
@@ -7,9 +8,9 @@ export async function GET() {
     const paymentMethods = await prisma.paymentMethod.findMany();
     return NextResponse.json(paymentMethods);
   } catch (error) {
-    console.error('Error fetching payment methods:', error);
+    console.error("Error fetching payment methods:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch payment methods', details: String(error) },
+      { error: "Failed to fetch payment methods", details: String(error) },
       { status: 500 }
     );
   }
@@ -17,6 +18,10 @@ export async function GET() {
 
 // POST create payment method
 export async function POST(request: NextRequest) {
+  // Require admin authorization
+  const { error } = await requireAdmin(request);
+  if (error) return error;
+
   try {
     const body = await request.json();
 
@@ -29,9 +34,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(paymentMethod, { status: 201 });
   } catch (error) {
-    console.error('Error creating payment method:', error);
+    console.error("Error creating payment method:", error);
     return NextResponse.json(
-      { error: 'Failed to create payment method' },
+      { error: "Failed to create payment method" },
       { status: 500 }
     );
   }

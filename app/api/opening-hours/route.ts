@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from '@/lib/prisma';
+import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/api-auth";
 
 // GET opening hours by cafe ID
 export async function GET(request: NextRequest) {
@@ -30,12 +31,16 @@ export async function GET(request: NextRequest) {
 
 // POST create opening hour
 export async function POST(request: NextRequest) {
+  // Require admin authorization
+  const { error } = await requireAdmin(request);
+  if (error) return error;
+
   try {
     const body = await request.json();
 
     // Parse time strings in HH:MM format
-    const [openHours, openMinutes] = body.openTime.split(':').map(Number);
-    const [closeHours, closeMinutes] = body.closeTime.split(':').map(Number);
+    const [openHours, openMinutes] = body.openTime.split(":").map(Number);
+    const [closeHours, closeMinutes] = body.closeTime.split(":").map(Number);
 
     // Store exact time without timezone conversion
     const openTime = new Date();
@@ -68,12 +73,16 @@ export async function POST(request: NextRequest) {
 
 // PUT update opening hour
 export async function PUT(request: NextRequest) {
+  // Require admin authorization
+  const { error } = await requireAdmin(request);
+  if (error) return error;
+
   try {
     const body = await request.json();
 
     // Parse time strings in HH:MM format
-    const [openHours, openMinutes] = body.openTime.split(':').map(Number);
-    const [closeHours, closeMinutes] = body.closeTime.split(':').map(Number);
+    const [openHours, openMinutes] = body.openTime.split(":").map(Number);
+    const [closeHours, closeMinutes] = body.closeTime.split(":").map(Number);
 
     // Store exact time without timezone conversion
     const openTime = new Date();

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from '@/lib/prisma';
+import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/api-auth";
 
 // GET images for a cafe
 export async function GET(request: NextRequest) {
@@ -31,6 +32,10 @@ export async function GET(request: NextRequest) {
 
 // POST add image to cafe
 export async function POST(request: NextRequest) {
+  // Require admin authorization
+  const { error } = await requireAdmin(request);
+  if (error) return error;
+
   try {
     const body = await request.json();
 
@@ -54,6 +59,10 @@ export async function POST(request: NextRequest) {
 
 // DELETE image
 export async function DELETE(request: NextRequest) {
+  // Require admin authorization
+  const { error } = await requireAdmin(request);
+  if (error) return error;
+
   try {
     const searchParams = request.nextUrl.searchParams;
     const imageId = searchParams.get("imageId");
