@@ -193,7 +193,10 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
             </p>
             <button
               onClick={() => {
-                window.open("https://forms.gle/YOUR_FORM_ID", "_blank");
+                window.open(
+                  "https://docs.google.com/forms/d/e/1FAIpQLScH3pXuneYfsU1ZPb2ePtP6biISv1gn6vCFRiseO-N-VzNhnA/viewform?usp=sharing&ouid=107076346346742720423",
+                  "_blank"
+                );
               }}
               className="bg-white text-[#803D3B] px-6 py-2 rounded-full font-semibold hover:bg-gray-100 transition-colors"
             >

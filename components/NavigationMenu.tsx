@@ -11,7 +11,8 @@ export default function NavigationMenu({
   onAboutClick,
   onDeveloperClick,
 }: NavigationMenuProps) {
-  const GOOGLE_FORM_URL = "https://forms.gle/YOUR_FORM_ID"; // TODO: Replace with actual form URL
+  const GOOGLE_FORM_URL =
+    "https://docs.google.com/forms/d/e/1FAIpQLScH3pXuneYfsU1ZPb2ePtP6biISv1gn6vCFRiseO-N-VzNhnA/viewform?usp=sharing&ouid=107076346346742720423"; // TODO: Replace with actual form URL
 
   const handleSubmitClick = () => {
     window.open(GOOGLE_FORM_URL, "_blank");
