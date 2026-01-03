@@ -94,7 +94,11 @@ export default function OpeningHoursPage() {
     }
   };
 
-  const handleHourChange = (dayOfWeek: string, field: string, value: any) => {
+  const handleHourChange = (
+    dayOfWeek: string,
+    field: keyof OpeningHour,
+    value: string | boolean
+  ) => {
     const existing = hours.find((h) => h.dayOfWeek === dayOfWeek);
 
     if (existing) {

@@ -12,13 +12,13 @@ interface Cafe {
   latitude: number | null;
   longitude: number | null;
   parking: string | null;
-  priceMin: number | null;
-  priceMax: number | null;
-  priceRange: string | null;
-  googleMapsUrl: string | null;
-  instagramUrl: string | null;
-  instagramUsername: string | null;
-  mainImageId: string | null;
+  priceMin?: number | null;
+  priceMax?: number | null;
+  priceRange?: string | null;
+  googleMapsUrl?: string | null;
+  instagramUrl?: string | null;
+  instagramUsername?: string | null;
+  mainImageId?: string | null;
   images?: {
     id: string;
     imageUrl: string;
