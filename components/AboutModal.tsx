@@ -48,7 +48,7 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 rounded-t-3xl flex items-center justify-between z-1000000">
           <h2 className="text-2xl font-bold text-[#803D3B]">
-            Tentang Ngopi di Jogja
+            Tentang wfcjogja
           </h2>
           <button
             onClick={handleClose}
@@ -79,7 +79,7 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
           >
             <div className="text-6xl mb-4">☕</div>
             <h3 className="text-xl font-semibold text-[#803D3B]">
-              NGOPI DI JOGJA
+              wfcjogja - Work From Cafe Jogja
             </h3>
             <p className="text-gray-600 text-sm">
               Temukan cafe terbaik untuk produktivitas Kamu
@@ -92,7 +92,7 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
             style={{ animationDelay: "0.2s" }}
           >
             <p>
-              <strong className="text-[#803D3B]">Ngopidijogja</strong> adalah
+              <strong className="text-[#803D3B]">wfcjogja</strong> adalah
               platform pencarian cafe yang dirancang khusus untuk para remote
               worker, freelancer, dan mahasiswa di Yogyakarta yang mencari
               tempat nyaman untuk bekerja atau belajar.
@@ -166,7 +166,7 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
                 "Next.js",
                 "TypeScript",
                 "Prisma",
-                "MySQL",
+                "PostgreeSQL",
                 "Tailwind CSS",
                 "Leaflet",
               ].map((tech) => (
