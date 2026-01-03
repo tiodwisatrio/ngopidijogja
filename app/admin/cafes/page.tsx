@@ -9,8 +9,10 @@ interface Cafe {
   slug: string;
   name: string;
   address: string;
+  latitude: number | null;
+  longitude: number | null;
   wifi: boolean;
-  parking: string;
+  parking: string | null;
 }
 
 const ITEMS_PER_PAGE = 10;
@@ -95,8 +97,15 @@ export default function CafesPage() {
                 <th className="text-left px-6 py-3 font-semibold text-gray-900">
                   Name
                 </th>
-                <th className="text-left px-6 py-3 font-semibold text-gray-900">
+                {/* <th className="text-left px-6 py-3 font-semibold text-gray-900">
                   Address
+                </th> */}
+
+                <th className="text-left px-6 py-3 font-semibold text-gray-900">
+                  Latitude
+                </th>
+                <th className="text-left px-6 py-3 font-semibold text-gray-900">
+                  Longitude
                 </th>
                 <th className="text-left px-6 py-3 font-semibold text-gray-900">
                   Parking
@@ -119,10 +128,16 @@ export default function CafesPage() {
                     <p className="font-semibold text-gray-900">{cafe.name}</p>
                     <p className="text-sm text-gray-600">{cafe.slug}</p>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-700">
+                  {/* <td className="px-6 py-4 text-sm text-gray-700">
                     {cafe.address}
-                  </td>
+                  </td> */}
 
+                  <td className="px-6 py-4 text-sm text-gray-700">
+                    {cafe.latitude || "N/A"}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-700">
+                    {cafe.longitude || "N/A"}
+                  </td>
                   <td className="px-6 py-4 text-sm text-gray-700">
                     {cafe.parking || "N/A"}
                   </td>
