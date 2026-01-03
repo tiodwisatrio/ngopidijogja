@@ -264,14 +264,10 @@ export default function SearchBar({
         .catch((error) => {
           setIsLoadingLocation(false);
 
-          // Detailed error logging
-          console.error("❌ Geolocation error:", {
-            code: error.code,
-            message: error.message,
-            PERMISSION_DENIED: error.code === 1,
-            POSITION_UNAVAILABLE: error.code === 2,
-            TIMEOUT: error.code === 3,
-          });
+          // Silent logging for development (tidak mengganggu)
+          if (process.env.NODE_ENV === 'development') {
+            console.log("Geolocation error:", error.code, error.message);
+          }
 
           let message = "❌ Gagal mendapatkan lokasi Kamu";
           let details = "";

@@ -40,6 +40,7 @@ interface CafeMapProps {
   selectedCafeId?: string;
   onCafeClick?: (cafe: Cafe) => void;
   onShowDetail?: (cafe: Cafe) => void;
+  userLocation?: { lat: number; lng: number } | null;
 }
 
 const YOGYAKARTA_CENTER: [number, number] = [-7.7975, 110.3695];
@@ -49,10 +50,12 @@ export default function CafeMap({
   selectedCafeId,
   onCafeClick,
   onShowDetail,
+  userLocation,
 }: CafeMapProps) {
   const mapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<Map<string, L.Marker>>(new Map());
   const popupCacheRef = useRef<Map<string, string>>(new Map());
+  const userMarkerRef = useRef<L.Marker | null>(null);
 
   // Memoize marker icon untuk menghindari recreate
   const markerIcon = useMemo(() => {
@@ -69,6 +72,24 @@ export default function CafeMap({
       iconAnchor: [20, 40],
       popupAnchor: [0, -70],
       className: "cafe-marker",
+    });
+  }, []);
+
+  // User location marker icon
+  const userMarkerIcon = useMemo(() => {
+    return L.divIcon({
+      html: `
+        <div class="user-marker-container">
+          <div class="user-marker-pulse"></div>
+          <div class="user-marker-circle">
+            <span class="user-marker-icon">📍</span>
+          </div>
+        </div>
+      `,
+      iconSize: [40, 40],
+      iconAnchor: [20, 20],
+      popupAnchor: [0, -20],
+      className: "user-marker",
     });
   }, []);
 
@@ -349,6 +370,40 @@ export default function CafeMap({
       marker.openPopup();
     }
   }, [selectedCafeId]);
+
+  // Handle user location marker
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    // Remove existing user marker
+    if (userMarkerRef.current) {
+      userMarkerRef.current.remove();
+      userMarkerRef.current = null;
+    }
+
+    // Add user marker if location is available
+    if (userLocation) {
+      const marker = L.marker([userLocation.lat, userLocation.lng], {
+        icon: userMarkerIcon,
+        zIndexOffset: 1000, // Make sure user marker is on top
+      }).addTo(mapRef.current);
+
+      marker.bindPopup(`
+        <div style="font-family: 'Poppins', sans-serif; padding: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+            <span style="font-size: 20px;">📍</span>
+            <strong style="color: #1565C0; font-size: 13px;">Lokasi Kamu</strong>
+          </div>
+          <p style="margin: 0; color: #666; font-size: 11px;">Cafe terdekat akan ditampilkan berdasarkan lokasi ini</p>
+        </div>
+      `);
+
+      userMarkerRef.current = marker;
+
+      // Center map to user location
+      mapRef.current.setView([userLocation.lat, userLocation.lng], 14);
+    }
+  }, [userLocation, userMarkerIcon]);
 
   return (
     <div
