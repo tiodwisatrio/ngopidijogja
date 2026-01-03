@@ -1,0 +1,25 @@
+# robots.txt untuk WFC Jogja
+User-agent: *
+Allow: /
+Allow: /favorites
+Disallow: /admin/
+Disallow: /api/
+Disallow: /login
+
+# Sitemap
+Sitemap: https://wfcjogja.vercel.app/sitemap.xml
+
+# Crawl-delay untuk semua bot
+Crawl-delay: 1
+
+# Google bot specific
+User-agent: Googlebot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# Bing bot specific
+User-agent: Bingbot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
