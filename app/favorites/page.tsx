@@ -148,12 +148,12 @@ export default function FavoritesPage() {
         ) : cafes.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20">
             <div className="w-32 h-32 mb-8 rounded-full bg-gray-50 flex items-center justify-center">
-              <div className="text-7xl">🤍</div>
+              <div className="text-4xl">🤍</div>
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-3">
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">
               Belum ada cafe favorit
             </h2>
-            <p className="text-gray-500 text-lg mb-8 max-w-md text-center">
+            <p className="text-gray-500 text-base mb-8 max-w-md text-center">
               Mulai eksplorasi dan simpan cafe favorit kamu dengan menekan
               tombol ❤️
             </p>
