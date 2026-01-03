@@ -385,16 +385,16 @@ export default function CafeMap({
     if (userLocation) {
       const marker = L.marker([userLocation.lat, userLocation.lng], {
         icon: userMarkerIcon,
-        zIndexOffset: 1000, 
+        zIndexOffset: 1000,
       }).addTo(mapRef.current);
 
       marker.bindPopup(`
-        <div style="font-family: 'Poppins', sans-serif; padding: 8px;">
+        <div style="font-family: 'Poppins', sans-serif; padding: 8px; text-center;">
           <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-            <span style="font-size: 14px;">📍</span>
-            <strong style="color: #1565C0; font-size: 13px;">Lokasi Kamu</strong>
+            <span style="font-size: 14px; text-center">📍</span>
+            <strong style="color: #1565C0; font-size: 13px; text-center;">Lokasi Kamu</strong>
           </div>
-          <p style="margin: 0; color: #666; font-size: 11px;">Cafe terdekat akan ditampilkan berdasarkan lokasi ini</p>
+          <p style="margin: 0; color: #666; font-size: 11px; text-center">Cafe terdekat akan ditampilkan berdasarkan lokasi ini</p>
         </div>
       `);
 
