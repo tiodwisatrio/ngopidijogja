@@ -2,11 +2,11 @@
 
 Platform untuk menemukan cafe di Yogyakarta yang cocok untuk bekerja, belajar, atau sekedar ngopi sambil nugas.
 
-🌐 **Live Demo:** https://ngopidijogja.vercel.app
+**Live Demo:** https://ngopidijogja.vercel.app
 
 ---
 
-## ✨ Features
+## Features
 
 - 🗺️ **Interactive Map** - Peta interaktif dengan Leaflet & OpenStreetMap
 - 📍 **Location-Based Search** - Cari cafe terdekat dari lokasi Anda
@@ -80,7 +80,7 @@ Server akan berjalan di: **http://localhost:3000**
 
 ---
 
-## 📚 Documentation
+## Documentation
 
 Untuk panduan lengkap development dan deployment, baca:
 
@@ -110,7 +110,7 @@ npm run import:data   # Import dari JSON ke database
 
 ---
 
-## 🗂️ Project Structure
+## Project Structure
 
 ```
 wfcjogja/
@@ -138,7 +138,7 @@ wfcjogja/
 
 ---
 
-## 🔧 Configuration
+## Configuration
 
 ### Environment Variables
 
@@ -157,11 +157,10 @@ NEXTAUTH_URL="https://ngopidijogja.vercel.app"
 BLOB_READ_WRITE_TOKEN="vercel-blob-token"
 ```
 
-⚠️ **JANGAN commit file `.env*` ke Git!**
 
 ---
 
-## 🚢 Deployment
+## Deployment
 
 ### Deploy ke Vercel
 
@@ -189,7 +188,7 @@ Vercel akan otomatis:
 
 ---
 
-## 📊 Database Schema
+## Database Schema
 
 ### Models
 
@@ -213,7 +212,7 @@ Cafe 1---* CafeImage
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Silakan:
 
@@ -225,13 +224,13 @@ Contributions are welcome! Silakan:
 
 ---
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License.
 
 ---
 
-## 👤 Author
+## Author
 
 **Tio Dwi Satrio**
 
@@ -239,7 +238,7 @@ This project is licensed under the MIT License.
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Next.js team untuk framework yang luar biasa
 - Vercel untuk platform deployment gratis
@@ -249,11 +248,11 @@ This project is licensed under the MIT License.
 
 ---
 
-## 🐛 Known Issues
+## Known Issues
 
 - None at the moment
 
-## 📅 Roadmap
+## Roadmap
 
 - [ ] Add user reviews & ratings
 - [ ] Add bookmark/favorite cafes
